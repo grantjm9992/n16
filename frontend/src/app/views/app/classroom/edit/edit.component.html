@@ -1,0 +1,48 @@
+<nav class="page-breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink="../">Classrooms</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ classroom === null ? 'Edit' : 'New'}}</li>
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title">Classroom</h6>
+
+        <form class="forms-sample" [formGroup]="classroomForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" autocomplete="off" placeholder="Name" formControlName="name">
+          </div>
+          <div class="mb-3">
+            <label for="capacity" class="form-label">Capacity</label>
+            <input type="integer" class="form-control" id="capacity" autocomplete="off" placeholder="Capacity" formControlName="capacity">
+          </div>
+          <div class="mb-3">
+            <label for="capacity" class="form-label">Order</label>
+            <input type="integer" class="form-control" id="order" autocomplete="off" placeholder="Order" formControlName="order">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Fill colour</label>
+            <input class="form-control wd-150"
+                   [(colorPicker)]="fill_colour"
+                   (colorPickerChange)="onFillColourChange($event)"
+                   [style.background]="fill_colour"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Text colour</label>
+            <input class="form-control wd-150"
+                   [(colorPicker)]="text_colour"
+                   (colorPickerChange)="onTextColourChange($event)"
+                   [style.background]="text_colour"/>
+          </div>
+          <button type="submit" class="btn btn-primary me-2">Submit</button>
+          <button class="btn btn-secondary">Cancel</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>

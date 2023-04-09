@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\Uuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Teacher extends Model
+{
+    use HasFactory;
+    use Uuids;
+
+    protected $appends = ['title'];
+
+    protected $fillable = [
+        'id',
+        'name',
+        'surname',
+        'email',
+        'phone',
+        'colour',
+        'text_colour',
+        'hours',
+        'morning',
+        'available',
+        'start_date',
+        'start_hours',
+        'leave_date',
+        'teacher_type_id',
+        'company_id',
+    ];
+
+    public function getTitleAttribute(): string
+    {
+        return $this->name;
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+}

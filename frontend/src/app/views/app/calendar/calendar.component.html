@@ -1,0 +1,35 @@
+<div class="row">
+  <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title">Filter classes</h6>
+        <ng-select [items]="simpleItems"
+                   bindLabel="name"
+                   bindValue="id"
+                   [searchable]="false"
+                   (change)="filterResources()"
+                   [(ngModel)]="selectedSimpleItem">
+        </ng-select>
+        <p class="mt-2 text-muted">Selected item: <span class="fw-bolder">{{selectedSimpleItem}}</span></p>
+
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title">Filter resources</h6>
+        <ng-select [items]="simpleItems"
+                   bindLabel="name"
+                   bindValue="id"
+                   [searchable]="false"
+                   (change)="filterResources()"
+                   [(ngModel)]="selectedSimpleItem">
+        </ng-select>
+        <p class="mt-2 text-muted">Selected item: <span class="fw-bolder">{{selectedSimpleItem}}</span></p>
+
+      </div>
+    </div>
+  </div>
+</div>
+<full-calendar [options]="calendarOptions"></full-calendar>

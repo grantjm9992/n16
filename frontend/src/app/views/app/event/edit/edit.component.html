@@ -1,0 +1,129 @@
+<nav class="page-breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink=".">Events</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ event === null ? 'New' : 'Edit' }}</li>
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title">Event</h6>
+        <form class="forms-sample" [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" autocomplete="off" placeholder="Name" formControlName="name">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">Event type</label>
+                <select class="form-select" id="event_type_id" formControlName="event_type_id">
+                  <option *ngFor="let option of eventTypes" [value]="option.id">{{option.name}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">Classroom</label>
+                <ng-select [items]="classrooms"
+                           bindLabel="name"
+                           bindValue="id"
+                           placeholder="type to search"
+                           formControlName="classroom_id">
+                </ng-select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">Teacher</label>
+                <ng-select [items]="teachers"
+                           bindLabel="name"
+                           bindValue="id"
+                           placeholder="type to search"
+                           formControlName="teacher_id">
+                </ng-select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">Group</label>
+                <ng-select [items]="groups"
+                           bindLabel="name"
+                           bindValue="id"
+                           placeholder="type to search"
+                           formControlName="group_id">
+                </ng-select>
+                <!--
+                <select class="form-select" id="group_id" formControlName="group_id">
+                  <option *ngFor="let option of groups" [value]="option.id">{{option.name}}</option>
+                </select>
+                -->
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">Department</label>
+                <select class="form-select" id="department_id" formControlName="department_id">
+                  <option *ngFor="let option of departments" [value]="option.id">{{option.name}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">Start date</label>
+                <div class="input-group">
+                  <input class="form-control" placeholder="yyyy-mm-dd" formControlName="date_range_start" ngbDatepicker #date_range_start="ngbDatepicker">
+                  <button class="input-group-text" type="button" (click)="date_range_start.toggle()">
+                    <i class="feather icon-calendar icon-md text-muted"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">End date</label>
+                <div class="input-group">
+                  <input class="form-control" placeholder="yyyy-mm-dd" formControlName="date_range_end" ngbDatepicker #date_range_end="ngbDatepicker">
+                  <button class="input-group-text" type="button" (click)="date_range_end.toggle()">
+                    <i class="feather icon-calendar icon-md text-muted"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label for="name" class="form-label">Days of the week</label>
+                <ng-select [items]="daysOfTheWeek"
+                           [multiple]="true"
+                           bindLabel="name"
+                           bindValue="id"
+                           placeholder="type to search"
+                           formControlName="days_of_the_week">
+                </ng-select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">Start time</label>
+                <ngb-timepicker formControlName="time_start"></ngb-timepicker>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">End time</label>
+                <ngb-timepicker formControlName="time_end"></ngb-timepicker>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary me-2">Submit</button>
+          <button class="btn btn-secondary">Cancel</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
