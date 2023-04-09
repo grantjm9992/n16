@@ -49,7 +49,8 @@ services:
         - laravel
 
     frontend:
-      context: ./frontend
+      build:
+        context: ./frontend
       ports:
         - "4200:4200"
       expose:
