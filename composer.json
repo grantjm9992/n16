@@ -29,6 +29,7 @@
 		"ext-pdo": "*",
 		"ext-pdo_mysql": "*",
 		"backpack/crud": "^5.4",
+		"google/apiclient": "^2.12.1",
 		"guzzlehttp/guzzle": "^7.4",
 		"jaybizzle/laravel-migrations-organiser": "^6.2",
 		"laravel/framework": "^9.19",
@@ -36,8 +37,9 @@
 		"laravel/tinker": "^2.7",
 		"php-open-source-saver/jwt-auth": "^2.0",
 		"podio-community/podio-php": "^6.1",
-		"ramsey/uuid": "^4.6"
-	},
+		"ramsey/uuid": "^4.6",
+      "ext-curl": "*"
+    },
 	"require-dev": {
 		"backpack/generators": "^3.3",
 		"bamarni/composer-bin-plugin": "^1.8",

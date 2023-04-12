@@ -32,7 +32,7 @@ return new class extends Migration
             $table->uuid('status_id')->nullable();
             $table->uuid('series_id')->nullable();
             $table->uuid('resource_id')->nullable();
-            $table->timestamp('start_date');
+            $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date');
             $table->timestamps();
         });

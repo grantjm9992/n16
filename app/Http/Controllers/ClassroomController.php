@@ -6,16 +6,22 @@ use App\Models\Classroom;
 use Illuminate\Contracts\Queue\EntityNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ClassroomController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $classrooms = Classroom::query()->with('company')->get();
+        $classrooms = Classroom::query()->with('company');
+        $user = Auth::user()->toArray();
+
+        if ($user['user_role'] !== 'super_admin') {
+            $classrooms->where('company_id', $user['company_id']);
+        }
 
         return response()->json([
             'status' => 'success',
-            'data' => $classrooms,
+            'data' => $classrooms->get(),
         ]);
     }
 
@@ -33,6 +39,7 @@ class ClassroomController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'company_id' => 'required|string|max:255',
             'order' => 'integer',
         ]);
 
@@ -48,6 +55,7 @@ class ClassroomController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'company_id' => 'required|string|max:255',
             'text_colour' => 'string',
             'fill_colour' => 'string',
             'order' => 'integer',

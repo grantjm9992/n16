@@ -9,12 +9,22 @@ use Carbon\CarbonPeriod;
 use Illuminate\Contracts\Queue\EntityNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
         $events = Event::query();
+        $user = Auth::user()->toArray();
+
+        if ($user['user_role'] !== 'super_admin') {
+            $events->where('company_id', $user['company_id']);
+        }
+
+        if ($user['user_role'] === 'teacher') {
+            $events->where('teacher_id', $user['id']);
+        }
 
         if ($request->query->get('date')) {
             $date = new \DateTime($request->query->get('date'));
@@ -24,9 +34,20 @@ class EventController extends Controller
             $events->where('start_date', 'LIKE', $date->format('Y-m-d')."%");
         }
 
+        $events->orderBy('created_at', 'DESC');
+
+        $eventArray = $events->get();
+
+        if ($request->query->get('by_teacher')) {
+            $eventArray = [];
+            foreach ($events->get()->toArray() as $event) {
+                $event['resourceId'] = $event['teacher_id'] ?? null;
+                $eventArray[] = $event;
+            }
+        }
         return response()->json([
             'status' => 'success',
-            'data' => $events->get(),
+            'data' => $eventArray,
         ]);
     }
 
@@ -42,6 +63,7 @@ class EventController extends Controller
 
     public function createRepeatedForDateRange(Request $request): JsonResponse
     {
+        $user = Auth::user()->toArray();
         $request->validate([
             'name' => 'string|max:255',
             'classroom_id' => 'string|max:255',
@@ -60,12 +82,14 @@ class EventController extends Controller
         $period = CarbonPeriod::create($request->date_range_start, $request->date_range_end);
         foreach ($period->toArray() as $date) {
             if (in_array($date->dayOfWeek, $request->days_of_the_week)) {
-                $startDate = $date->setTimeFromTimeString($request->time_start);
-                $endDate = $date->setTimeFromTimeString($request->time_end);
+                $startDate = $date->clone();
+                $endDate = $date->clone();
+                $startDate = $startDate->setTimeFromTimeString($request->time_start);
+                $endDate = $endDate->setTimeFromTimeString($request->time_end);
                 Event::create([
                     'start_date' => $startDate,
                     'end_date' => $endDate,
-                    'description' => $request->description,
+                    'description' => $request->name,
                     'classroom_id' => $request->classroom_id,
                     'teacher_id' => $request->teacher_id,
                     'event_type_id' => $request->event_type_id,
@@ -73,6 +97,7 @@ class EventController extends Controller
                     'user_id' => $request->user_id,
                     'department_id' => $request->department_id,
                     'status_id' => $request->status_id,
+                    'company_id' => $user['company_id'],
                 ]);
             }
         }
@@ -180,11 +205,11 @@ class EventController extends Controller
         ], 201);
     }
 
-    public function updateTeacher(Request $request, string $id, string $classroomId): JsonResponse
+    public function updateTeacher(Request $request, string $id, string $teacherId): JsonResponse
     {
         $event = Event::find($id);
         $event->update([
-            'classroom_id' => $classroomId,
+            'teacher_id' => $teacherId,
         ]);
         $event->save();
 

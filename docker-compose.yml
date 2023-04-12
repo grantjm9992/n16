@@ -13,9 +13,11 @@ services:
         dockerfile: ./Dockerfile
       container_name: ${COMPOSE_PROJECT_NAME}_laravel
       expose:
-        - 8004
+        - 80
+        - 443
       ports:
-        - "8004:8004"
+        - "80:80"
+        - "443:443"
       volumes:
         - .:/var/www/html:cached
       depends_on:
@@ -39,23 +41,10 @@ services:
         MYSQL_ROOT_PASSWORD: secret
         MYSQL_DATABASE: laravel
       ports:
-        - "33061:3310"
+        - "33061:3306"
       volumes:
         - ./storage/mysql-data:/var/lib/mysql:delegated
         - ./docker/dev/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-      networks:
-        - laravel
-
-    frontend:
-      build:
-        context: ./frontend
-      ports:
-        - "4200:4200"
-      expose:
-        - 4200
-      container_name: ${COMPOSE_PROJECT_NAME}_angular
-      volumes:
-        - ./frontend:/app
       networks:
         - laravel
 

@@ -11,7 +11,7 @@ class DepartmentEventTypeSeeder extends Seeder
     public function run()
     {
         foreach (self::departmentSeedData() as $row) {
-            DB::table('department')->insert($row);
+            DB::table('departments')->insert($row);
         }
         foreach (self::eventTypeSeedData() as $row) {
             DB::table('event_types')->insert([

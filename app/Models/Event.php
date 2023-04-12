@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Event extends Model
 {
@@ -12,8 +14,23 @@ class Event extends Model
     use Uuids;
 
     protected $appends = [
-        'start', 'end', 'resourceId', 'title',
+        'start', 'end', 'resourceId', 'title', 'backgroundColor', 'textColor',
     ];
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(Teacher::class);
+    }
+
+    public function getBackgroundColorAttribute(): ?string
+    {
+        return $this->teacher?->colour;
+    }
+
+    public function getTextColorAttribute(): ?string
+    {
+        return $this->teacher?->text_colour;
+    }
 
     public function getStartAttribute()
     {
