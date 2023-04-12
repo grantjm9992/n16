@@ -11,8 +11,6 @@ class Department extends Model
     use HasFactory;
     use Uuids;
 
-    protected $table = 'department';
-
     protected $fillable = [
         'name',
     ];
