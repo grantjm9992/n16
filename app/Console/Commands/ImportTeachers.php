@@ -14,6 +14,8 @@ class ImportTeachers extends Command
 
     public function handle(): void
     {
+        Teacher::query()->delete();
+        User::query()->where('user_role', 'teacher')->delete();
         $contents = file_get_contents(public_path().'/teachers.json');
         $decodedContents = json_decode($contents, true);
         foreach ($decodedContents as $row) {
