@@ -195,10 +195,18 @@ class EventController extends Controller
     public function updateClassroom(Request $request, string $id, string $classroomId): JsonResponse
     {
         $event = Event::find($id);
-        $event->update([
-            'classroom_id' => $classroomId,
-        ]);
-        $event->save();
+        if ($event->group_id !== null) {
+            Event::query()->where( 'group_id', $event->group_id)->where('start_date', '>=', $event->start_date)->update([
+                'classroom_id' => $classroomId,
+            ]);
+        }
+
+        if ($event->group_id === null) {
+            $event->update([
+                'classroom_id' => $classroomId,
+            ]);
+            $event->save();
+        }
 
         return new JsonResponse([
             'data' => $event,

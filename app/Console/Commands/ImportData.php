@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Company;
 use App\Models\Event;
 use Illuminate\Console\Command;
 
@@ -15,10 +16,11 @@ class ImportData extends Command
         $decodedContents = json_decode($contents, true);
         foreach ($decodedContents as $row) {
             Event::create([
-                'company_id' => 'company_id',
+                'company_id' => 'not_set',
                 'start_date' => $row['start'],
                 'end_date' => $row['end'],
                 'description' => $row['title'],
+                'name' => $row['title'],
                 'teacher_colour' => $row['color'],
                 'event_type_colour' => $row['textColor'],
                 'teacher_id' => $row['numIdProfesor'],
@@ -27,5 +29,32 @@ class ImportData extends Command
                 'classroom_id' => $row['resourceId'],
             ]);
         }
+        $companies = Company::all()->toArray();
+        $this->updateCompanyIds($companies);
     }
+
+    private function updateCompanyIds(array $companies): void
+    {
+        $array = [
+            'San Miguel' => 'SM',
+            'Gomez Laguna' => 'GL',
+            'Alonso Martinez' => 'AM',
+            'Arguelles' => 'AR',
+            'Nuevos Ministerios' => 'NM',
+            'La Paz' => 'LP',
+            'Ercilla' => 'ER',
+            'Rambla Catalunya' => 'RC',
+            'Number 16 plus/Online' => 'OL',
+        ];
+
+        foreach ($companies as $company) {
+            $initials = $array[$company['name']] ?? 'DOESNTEXIST';
+            \DB::table('events')->where('description', 'LIKE', "$initials%")->where('company_id', 'not_set')->update([
+                'company_id' => $company['id']
+            ]);
+        }
+        \DB::update('UPDATE events SET teacher_id = (SELECT id FROM teachers WHERE CAST(teachers.old_id AS CHAR) = events.teacher_id)');
+        \DB::update('UPDATE events SET classroom_id = (SELECT id FROM classrooms WHERE CAST(classrooms.old_id AS CHAR) = events.classroom_id)');
+    }
+
 }
