@@ -24,6 +24,10 @@ class TeacherController extends Controller
             $classrooms->where('company_id', $user['company_id']);
         }
 
+        if ($request->query->get('company_id')) {
+            $classrooms->where('company_id', $request->query->get('company_id'));
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => $classrooms->get(),

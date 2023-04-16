@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Classroom;
 use App\Models\Event;
+use App\Models\Group;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Contracts\Queue\EntityNotFoundException;
@@ -97,10 +98,57 @@ class EventController extends Controller
                     'user_id' => $request->user_id,
                     'department_id' => $request->department_id,
                     'status_id' => $request->status_id,
-                    'company_id' => $user['company_id'],
+                    'company_id' => $request->company_id ?? $user['company_id'],
                 ]);
             }
         }
+
+        Group::create([
+            'name' => $request->name,
+            'data' => json_encode($request->toArray()),
+        ]);
+
+        return new JsonResponse([], 201);
+    }
+
+    public function updateEventsForGroup(Request $request, string $groupId): JsonResponse
+    {
+        $group = Group::find($groupId);
+        $request->validate([
+            'description' => 'string|max:255',
+            'classroom_id' => 'string|max:255',
+            'teacher_id' => 'string|max:255',
+            'event_type_id' => 'required|string|max:255',
+            'department_id' => 'string|max:255',
+            'date_range_start' => 'required|string|max:255',
+            'time_start' => 'string',
+            'time_end' => 'string',
+        ]);
+
+        Event::query()
+            ->where('group_id', $groupId)
+            ->where('start_date', '>=', Carbon::createFromFormat('Y-m-d', $request->date_range_start)->format('Y-m-d 00:00:00'))
+            ->update($request->toArray());
+
+        $groupData = json_decode($group->data);
+        $groupData = array_merge($groupData, $request->toArray());
+        $group->data = json_encode($groupData);
+        $group->save();
+
+        return new JsonResponse([], 201);
+    }
+
+    public function deleteEventsForGroup(Request $request, string $groupId): JsonResponse
+    {
+        $request->validate([
+            'date_range_start' => 'required|string|max:255',
+        ]);
+        $group = Group::find($groupId);
+        $group->delete();
+        Event::query()
+            ->where('group_id', $groupId)
+            ->where('start_date', '>=', Carbon::createFromFormat('Y-m-d', $request->date_range_start)->format('Y-m-d 00:00:00'))
+            ->delete();
 
         return new JsonResponse([], 201);
     }
@@ -161,16 +209,27 @@ class EventController extends Controller
         ]);
     }
 
+    public function updateDates(Request $request, string $id): JsonResponse
+    {
+        $request->validate([
+            'start_date' => 'required|string|max:255',
+            'end_date' => 'required|string|max:255',
+        ]);
+
+        $event = Event::find($id);
+        $event->update($request->toArray());
+        $event->save();
+
+        return new JsonResponse([], 201);
+    }
+
     public function update(Request $request, string $id): JsonResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'classroom_id' => 'required|string|max:255',
             'teacher_id' => 'required|string|max:255',
             'event_type_id' => 'required|string|max:255',
-            'group_id' => 'required|string|max:255',
-            'user_id' => 'required|string|max:255',
             'department_id' => 'required|string|max:255',
             'start_date' => 'required|string|max:255',
             'end_date' => 'required|string|max:255',
@@ -184,6 +243,11 @@ class EventController extends Controller
         }
 
         $event->update($request->toArray());
+        if ((int)$request->status_id !== 1) {
+            $event->update([
+                'teacher_id' => 'not_set',
+            ]);
+        }
         $event->save();
 
         return response()->json([

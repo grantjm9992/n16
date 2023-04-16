@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventTypeController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\ResourceTypeController;
 use App\Http\Controllers\RoleController;
@@ -96,6 +97,9 @@ Route::middleware('jwt.verify')->group(function() {
         Route::delete('{id}', 'delete');
         Route::post('update-classroom/{id}/{classroomId}', 'updateClassroom');
         Route::post('update-teacher/{id}/{teacherId}', 'updateTeacher');
+        Route::post('update-events-for-group/{groupId}', 'updateEventsForGroup');
+        Route::post('delete-events-for-group/{groupId}', 'deleteEventsForGroup');
+        Route::post('/update-dates/{id}', 'updateDates');
     });
 
     Route::controller( TeacherController::class)->prefix('teacher/')->group(function() {
@@ -122,5 +126,13 @@ Route::middleware('jwt.verify')->group(function() {
 
     Route::controller( GroupController::class)->prefix('groups/')->group(function () {
         Route::get('', 'index');
+    });
+
+    Route::controller( HolidayController::class)->prefix('holidays/')->group(function () {
+        Route::get('', 'index');
+        Route::post('', 'create');
+        Route::get('{id}/accept', 'accept');
+        Route::get('{id}/reject', 'reject');
+        Route::get('{id}/revoke', 'revoke');
     });
 });

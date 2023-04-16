@@ -24,11 +24,17 @@ class Event extends Model
 
     public function getBackgroundColorAttribute(): ?string
     {
+        if ((int)$this->status_id !== 1) {
+            return 'darkgrey';
+        }
         return $this->teacher?->colour;
     }
 
     public function getTextColorAttribute(): ?string
     {
+        if ((int)$this->status_id !== 1) {
+            return 'white';
+        }
         return $this->teacher?->text_colour;
     }
 
@@ -74,5 +80,6 @@ class Event extends Model
         'series_id',
         'resource_id',
         'pre_painted',
+        'holiday_id',
     ];
 }
