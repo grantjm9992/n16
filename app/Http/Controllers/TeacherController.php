@@ -16,7 +16,7 @@ class TeacherController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $classrooms = Teacher::query()->with('company');
+        $classrooms = Teacher::query()->orderBy('name', 'ASC')->orderBy('surname', 'ASC')->with('company');
 
         $user = Auth::user()->toArray();
 
@@ -53,6 +53,9 @@ class TeacherController extends Controller
             'company_id' => 'required|string',
             'text_colour' => 'string',
             'colour' => 'string',
+            'hours' => 'string',
+            'start_date' => 'string',
+            'start_hours' => 'string',
         ]);
 
         $user = User::query()->where('email', $request->email)->first();
@@ -82,6 +85,9 @@ class TeacherController extends Controller
             'company_id' => 'required|string',
             'text_colour' => 'string',
             'colour' => 'string',
+            'hours' => 'string',
+            'start_date' => 'string',
+            'start_hours' => 'string',
         ]);
 
         $classroom = Teacher::find($id);

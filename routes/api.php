@@ -12,6 +12,7 @@ use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\ResourceTypeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\TeachingHourController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -125,6 +126,10 @@ Route::middleware('jwt.verify')->group(function() {
     });
 
     Route::controller( GroupController::class)->prefix('groups/')->group(function () {
+        Route::get('', 'index');
+    });
+
+    Route::controller( TeachingHourController::class)->prefix('teaching-hours/')->group(function () {
         Route::get('', 'index');
     });
 

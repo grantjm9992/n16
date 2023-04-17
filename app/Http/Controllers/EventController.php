@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Classroom;
 use App\Models\Event;
 use App\Models\Group;
+use App\Models\TeachingHours;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Contracts\Queue\EntityNotFoundException;
@@ -87,6 +88,7 @@ class EventController extends Controller
                 $endDate = $date->clone();
                 $startDate = $startDate->setTimeFromTimeString($request->time_start);
                 $endDate = $endDate->setTimeFromTimeString($request->time_end);
+
                 Event::create([
                     'start_date' => $startDate,
                     'end_date' => $endDate,

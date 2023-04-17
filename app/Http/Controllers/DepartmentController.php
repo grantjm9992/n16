@@ -13,7 +13,7 @@ class DepartmentController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $eventTypes = Department::query()->get();
+        $eventTypes = Department::query()->orderBy('name', 'ASC')->get();
 
         return response()->json([
             'status' => 'success',

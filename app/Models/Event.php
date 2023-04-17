@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Uuids;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -82,4 +83,10 @@ class Event extends Model
         'pre_painted',
         'holiday_id',
     ];
+
+    public function getDurationInSeconds(): int
+    {
+        return Carbon::createFromFormat('Y-m-d H:i', $this->end_date)->getTimestamp() -
+            Carbon::createFromFormat('Y-m-d H:i', $this->start_date)->getTimestamp();
+    }
 }

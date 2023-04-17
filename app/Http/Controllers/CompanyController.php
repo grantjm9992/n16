@@ -15,7 +15,7 @@ class CompanyController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $companies = Company::all();
+        $companies = Company::query()->orderBy('name', 'ASC')->get();
 
         return response()->json([
             'status' => 'success',

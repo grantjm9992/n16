@@ -10,7 +10,7 @@ class ResourceController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $eventTypes = Resource::query()->get();
+        $eventTypes = Resource::query()->orderBy('name', 'ASC')->get();
 
         return new JsonResponse($eventTypes);
     }
