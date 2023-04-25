@@ -63,8 +63,8 @@ class TeachingHourController extends Controller
             $returnArray = [];
             foreach ($teachers as $teacher) {
                 $events = Event::query()
-                    ->where('start_date', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
-                    ->where('end_date', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
+                    ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
+                    ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
                     ->where('teacher_id', $teacher->id)
                     ->get()->toArray();
                 $_teacher = $teacher->toArray();
@@ -80,8 +80,8 @@ class TeachingHourController extends Controller
             $returnArray = [];
             foreach ($departments as $department) {
                 $events = Event::query()
-                    ->where('start_date', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
-                    ->where('end_date', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
+                    ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
+                    ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
                     ->where('department_id', $department->id);
 
                 if ($user['user_role'] !== 'super_admin') {
