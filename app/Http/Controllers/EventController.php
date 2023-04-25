@@ -154,10 +154,12 @@ class EventController extends Controller
             'date_range_start' => 'required|string|max:255',
         ]);
         $group = Group::find($groupId);
-        $group->delete();
+        if (null !== $group) {
+            $group->delete();
+        }
         Event::query()
             ->where('group_id', $groupId)
-            ->where('start_date', '>=', Carbon::createFromFormat('Y-m-d', $request->date_range_start)->format('Y-m-d 00:00:00'))
+            ->where('start_date', '>=', Carbon::parse($request->date_range_start)->format('Y-m-d 00:00:00'))
             ->delete();
 
         return new JsonResponse([], 201);

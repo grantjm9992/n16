@@ -130,7 +130,7 @@ Route::middleware('jwt.verify')->group(function() {
     });
 
     Route::controller( TeachingHourController::class)->prefix('teaching-hours/')->group(function () {
-        Route::get('', 'index');
+        Route::get('', 'data');
     });
 
     Route::controller( HolidayController::class)->prefix('holidays/')->group(function () {
