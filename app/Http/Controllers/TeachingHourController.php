@@ -66,7 +66,7 @@ class TeachingHourController extends Controller
                     ->where('start_date', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
                     ->where('end_date', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
                     ->where('teacher_id', $teacher->id)
-                    ->get();
+                    ->get()->toArray();
                 $_teacher = $teacher->toArray();
                 $_teacher['time'] = round($this->getTotalTimeForEventArray($events)/3600, 2);
                 $returnArray[] = $_teacher;
@@ -91,7 +91,7 @@ class TeachingHourController extends Controller
                 if ($request->query->get('company_id')) {
                     $events->where('company_id', $request->query->get('company_id'));
                 }
-                $events = $events->get();
+                $events = $events->get()->toArray();
                 $_teacher = $department->toArray();
                 $_teacher['time'] = round($this->getTotalTimeForEventArray($events)/3600, 2);
                 $returnArray[] = $_teacher;
@@ -103,11 +103,11 @@ class TeachingHourController extends Controller
         return response()->json([]);
     }
 
-    private function getTotalTimeForEventArray($events): int
+    private function getTotalTimeForEventArray(array $events): int
     {
         $time = 0;
         foreach ($events as $event) {
-            $time += Carbon::parse($event->end_date)->getTimestamp() - Carbon::parse($event->start_date)->getTimestamp();
+            $time += Carbon::parse($event['end_date'])->getTimestamp() - Carbon::parse($event['start_date'])->getTimestamp();
         }
         return $time;
     }
