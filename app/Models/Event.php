@@ -26,7 +26,7 @@ class Event extends Model
     public function getBackgroundColorAttribute(): ?string
     {
         if ((int)$this->status_id !== 1) {
-            return 'darkgrey';
+            return '#f4ecc5';
         }
         return $this->teacher?->colour;
     }

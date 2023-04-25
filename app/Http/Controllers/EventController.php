@@ -24,17 +24,16 @@ class EventController extends Controller
             $events->where('company_id', $user['company_id']);
         }
 
-        if ($user['user_role'] === 'teacher') {
+        if ($user['user_role'] === 'teacher' && $request->query->get('my_calendar')) {
             $events->where('teacher_id', $user['id']);
         }
 
         if ($request->query->get('date')) {
             $date = new \DateTime($request->query->get('date'));
-            $events->where('start_date', 'LIKE', $date->format('Y-m-d')."%");
         } else {
             $date = new \DateTime();
-            $events->where('start_date', 'LIKE', $date->format('Y-m-d')."%");
         }
+        $events->where('start_date', 'LIKE', $date->format('Y-m-d')."%");
 
         $events->orderBy('created_at', 'DESC');
 
@@ -120,22 +119,31 @@ class EventController extends Controller
             'description' => 'string|max:255',
             'classroom_id' => 'string|max:255',
             'teacher_id' => 'string|max:255',
-            'event_type_id' => 'required|string|max:255',
             'department_id' => 'string|max:255',
             'date_range_start' => 'required|string|max:255',
             'time_start' => 'string',
             'time_end' => 'string',
         ]);
 
-        Event::query()
+        $events = Event::query()
             ->where('group_id', $groupId)
             ->where('start_date', '>=', Carbon::createFromFormat('Y-m-d', $request->date_range_start)->format('Y-m-d 00:00:00'))
-            ->update($request->toArray());
+            ->get();
+        foreach ($events as $event) {
+            $event->update($request->toArray());
+            if ($request->time_start) {
+                $event->start_date = Carbon::parse($event->start_date)->setTimeFromTimeString($request->time_start)->format('Y-m-d H:i');
+                $event->end_date = Carbon::parse($event->end_date)->setTimeFromTimeString($request->time_end)->format('Y-m-d H:i');
+            }
+            $event->save();
+        }
 
-        $groupData = json_decode($group->data);
-        $groupData = array_merge($groupData, $request->toArray());
-        $group->data = json_encode($groupData);
-        $group->save();
+        if ($group) {
+            $groupData = json_decode($group->data);
+            $groupData = array_merge($groupData, $request->toArray());
+            $group->data = json_encode($groupData);
+            $group->save();
+        }
 
         return new JsonResponse([], 201);
     }
@@ -153,6 +161,15 @@ class EventController extends Controller
             ->delete();
 
         return new JsonResponse([], 201);
+    }
+
+    public function delete(string $id): JsonResponse
+    {
+        $event = Event::find($id);
+        $event->delete();
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 
     public function createSingleEvent(Request $request): JsonResponse

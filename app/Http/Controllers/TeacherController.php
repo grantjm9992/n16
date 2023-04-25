@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Classroom;
 use App\Models\Teacher;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\EntityNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,7 +17,11 @@ class TeacherController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $classrooms = Teacher::query()->orderBy('name', 'ASC')->orderBy('surname', 'ASC')->with('company');
+        $classrooms = Teacher::query()
+            ->whereRaw('(leave_date IS NULL OR leave_date >= "' . Carbon::now()->format('Y-m-d'). '") ')
+            ->orderBy('name', 'ASC')
+            ->orderBy('surname', 'ASC')
+            ->with('company');
 
         $user = Auth::user()->toArray();
 
@@ -87,13 +92,14 @@ class TeacherController extends Controller
             'colour' => 'string',
             'hours' => 'string',
             'start_date' => 'string',
+            'leave_date' => 'string',
             'start_hours' => 'string',
         ]);
 
         $classroom = Teacher::find($id);
 
         if (null === $classroom) {
-            throw new EntityNotFoundException();
+            throw new EntityNotFoundException(Teacher::class, $id);
         }
 
         $classroom->update($request->toArray());
@@ -102,6 +108,24 @@ class TeacherController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $classroom,
+        ]);
+    }
+
+    public function delete(Request $request, string $id): JsonResponse
+    {
+        $request->validate([
+            'leave_date' => 'string|required',
+        ]);
+
+        $teacher = Teacher::find($id);
+        $teacher->leave_date = $request->leave_date;
+        $teacher->save();
+
+        $user = User::find($id);
+        $user->delete();
+
+        return response()->json([
+            'status' => 'success',
         ]);
     }
 }
