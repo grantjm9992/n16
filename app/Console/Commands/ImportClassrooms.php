@@ -14,12 +14,15 @@ class ImportClassrooms extends Command
     {
         $contents = file_get_contents(public_path().'/classrooms.json');
         $decodedContents = json_decode($contents, true);
+        $i = 1;
         foreach ($decodedContents as $row) {
             Classroom::create([
                 'old_id' => $row['id'],
                 'name' => $row['title'],
                 'company_id' => 'not_set',
+                'order' => $i,
             ]);
+            $i++;
         }
         $companies = Company::all()->toArray();
         $this->updateCompanyIds($companies);

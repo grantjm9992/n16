@@ -15,12 +15,20 @@ class Event extends Model
     use Uuids;
 
     protected $appends = [
-        'start', 'end', 'resourceId', 'title', 'backgroundColor', 'textColor',
+        'start', 'end', 'resourceId', 'title', 'backgroundColor', 'textColor', 'borderColor',
     ];
 
     public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class);
+    }
+
+    public function getBorderColorAttribute(): ?string
+    {
+        if ((int)$this->status_id !== 1) {
+            return 'black';
+        }
+        return $this->teacher?->colour;
     }
 
     public function getBackgroundColorAttribute(): ?string

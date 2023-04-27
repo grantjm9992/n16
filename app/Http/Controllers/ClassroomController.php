@@ -12,7 +12,7 @@ class ClassroomController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $classrooms = Classroom::query()->with('company')->orderBy('name', 'ASC');
+        $classrooms = Classroom::query()->with('company')->orderBy('order', 'ASC');
         $user = Auth::user()->toArray();
 
         if ($user['user_role'] !== 'super_admin') {

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Company;
 use App\Models\Event;
+use App\Models\EventType;
 use Illuminate\Console\Command;
 
 class ImportData extends Command
@@ -47,12 +48,26 @@ class ImportData extends Command
             'Number 16 plus/Online' => 'OL',
         ];
 
+        $eventType = [
+            ["id"=>1,"name"=>"Prueba de nivel"],
+            ["id"=>2,"name"=>"Lectiva"],
+            ["id"=>7,"name"=>"Drive"],
+            ["id"=>8,"name"=>"Disp. Pas."],
+            ["id"=>9,"name"=>"Kids walk"],
+            ["id"=>10,"name"=>"Holiday"],
+            ["id"=>11,"name"=>"Baja"],
+            ["id"=>12,"name"=>"Training"]
+        ];
+
         foreach ($companies as $company) {
             $initials = $array[$company['name']] ?? 'DOESNTEXIST';
             \DB::table('events')->where('description', 'LIKE', "$initials%")->where('company_id', 'not_set')->update([
                 'company_id' => $company['id']
             ]);
         }
+
+        $eventTypes = EventType::all()->toArray();
+
         \DB::update('UPDATE events SET teacher_id = (SELECT id FROM teachers WHERE CAST(teachers.old_id AS CHAR) = events.teacher_id)');
         \DB::update('UPDATE events SET classroom_id = (SELECT id FROM classrooms WHERE CAST(classrooms.old_id AS CHAR) = events.classroom_id)');
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use App\Models\Event;
+use App\Models\EventType;
 use App\Models\Teacher;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -72,6 +73,39 @@ class TeachingHourController extends Controller
                 $returnArray[] = $_teacher;
             }
 
+            return response()->json($returnArray);
+        }
+
+        if ($request->group_by === 'teacher_and_event_type') {
+            $teachers = Teacher::query();
+            if ($user['user_role'] !== 'super_admin') {
+                $teachers->where('company_id', $user['company_id']);
+            }
+            if ($request->query->get('company_id')) {
+                $teachers->where('company_id', $request->query->get('company_id'));
+            }
+            $teachers = $teachers->get();
+            $returnArray = [];
+            $eventTypes = EventType::all();
+            foreach ($teachers as $teacher) {
+                foreach ($eventTypes as $eventType) {
+                    $events = Event::query()
+                        ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
+                        ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
+                        ->where('teacher_id', $teacher->id)
+                        ->where('event_type_id', $eventType->id)
+                        ->get()->toArray();
+                    $time = round($this->getTotalTimeForEventArray($events)/3600, 2);
+                    if ($time > 0) {
+                        $returnArray[] = [
+                            'name' => $teacher->name,
+                            'surname' => $teacher->surname,
+                            'event_type' => $eventType->name,
+                            'time' => $time,
+                        ];
+                    }
+                }
+            }
             return response()->json($returnArray);
         }
 
