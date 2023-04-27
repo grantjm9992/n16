@@ -28,6 +28,9 @@ class Event extends Model
         if ((int)$this->status_id !== 1) {
             return 'black';
         }
+        if (!$this->teacher) {
+            return 'black';
+        }
         return $this->teacher?->colour;
     }
 

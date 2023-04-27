@@ -96,14 +96,14 @@ class TeachingHourController extends Controller
                         ->where('event_type_id', $eventType->id)
                         ->get()->toArray();
                     $time = round($this->getTotalTimeForEventArray($events)/3600, 2);
-                    if ($time > 0) {
+//                    if ($time > 0) {
                         $returnArray[] = [
                             'name' => $teacher->name,
                             'surname' => $teacher->surname,
                             'event_type' => $eventType->name,
                             'time' => $time,
                         ];
-                    }
+//                    }
                 }
             }
             return response()->json($returnArray);
