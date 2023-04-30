@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('department', function (Blueprint $table) {
+        Schema::table('departments', function (Blueprint $table) {
             $table->uuid('parent_id')->nullable();
         });
     }
