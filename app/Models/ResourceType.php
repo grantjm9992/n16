@@ -7,7 +7,7 @@ use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ResourceType extends Model
+class ResourceType extends AbstractModel
 {
 
     use HasFactory;

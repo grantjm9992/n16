@@ -24,7 +24,7 @@ class UsersController extends Controller
 
         $setArray = $request->toArray();
         $setArray['password'] = Hash::make('defaultPassword');
-        if (!$request['company_id'] && $request['user_role'] == 'super_admin') {
+        if (!$request['company_id'] && in_array($request['user_role'], ['super_admin', 'admin'])) {
             $setArray['company_id'] = 'super_admin';
         }
         $user = User::create($setArray);
@@ -80,7 +80,7 @@ class UsersController extends Controller
         $user = Auth::user()->toArray();
         $users = User::query()->with('company');
 
-        if ($user['user_role'] !== 'super_admin') {
+        if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
             $users->where('company_id', $user['company_id']);
         }
 

@@ -15,7 +15,7 @@ class ClassroomController extends Controller
         $classrooms = Classroom::query()->with('company')->orderBy('order', 'ASC');
         $user = Auth::user()->toArray();
 
-        if ($user['user_role'] !== 'super_admin') {
+        if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
             $classrooms->where('company_id', $user['company_id']);
         }
 

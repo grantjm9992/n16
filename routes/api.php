@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventTypeController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\HistoryLogController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\ResourceTypeController;
@@ -131,6 +132,10 @@ Route::middleware('jwt.verify')->group(function() {
 
     Route::controller( TeachingHourController::class)->prefix('teaching-hours/')->group(function () {
         Route::get('', 'data');
+    });
+
+    Route::controller( HistoryLogController::class)->prefix('history-log/')->group(function () {
+        Route::get('', 'index');
     });
 
     Route::controller( HolidayController::class)->prefix('holidays/')->group(function () {

@@ -20,9 +20,9 @@ class EventController extends Controller
         $events = Event::query();
         $user = Auth::user()->toArray();
 
-        if ($user['user_role'] !== 'super_admin') {
-            $events->where('company_id', $user['company_id']);
-        }
+//        if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
+//            $events->where('company_id', $user['company_id']);
+//        }
 
         if ($user['user_role'] === 'teacher' && $request->query->get('my_calendar')) {
             $events->where('teacher_id', $user['id']);
@@ -67,12 +67,12 @@ class EventController extends Controller
         $user = Auth::user()->toArray();
         $request->validate([
             'name' => 'string|max:255',
-            'classroom_id' => 'string|max:255',
-            'teacher_id' => 'string|max:255',
+            'classroom_id' => 'string|max:255|nullable',
+            'teacher_id' => 'string|max:255|nullable',
             'event_type_id' => 'required|string|max:255',
-            'group_id' => 'string|max:255',
-            'user_id' => 'string|max:255',
-            'department_id' => 'string|max:255',
+            'group_id' => 'string|max:255|nullable',
+            'user_id' => 'string|max:255|nullable',
+            'department_id' => 'string|max:255|nullable',
             'date_range_start' => 'string|max:255',
             'date_range_end' => 'string|max:255',
             'days_of_the_week' => 'array',
@@ -93,11 +93,11 @@ class EventController extends Controller
                     'end_date' => $endDate,
                     'description' => $request->name,
                     'classroom_id' => $request->classroom_id,
-                    'teacher_id' => $request->teacher_id,
+                    'teacher_id' => $request->teacher_id ?? null,
                     'event_type_id' => $request->event_type_id,
                     'group_id' => $request->group_id,
                     'user_id' => $request->user_id,
-                    'department_id' => $request->department_id,
+                    'department_id' => $request->department_id ?? null,
                     'status_id' => $request->status_id,
                     'company_id' => $request->company_id ?? $user['company_id'],
                 ]);
@@ -117,9 +117,9 @@ class EventController extends Controller
         $group = Group::find($groupId);
         $request->validate([
             'description' => 'string|max:255',
-            'classroom_id' => 'string|max:255',
-            'teacher_id' => 'string|max:255',
-            'department_id' => 'string|max:255',
+            'classroom_id' => 'string|max:255|nullable',
+            'teacher_id' => 'string|max:255|nullable',
+            'department_id' => 'string|max:255|nullable',
             'date_range_start' => 'required|string|max:255',
             'time_start' => 'string',
             'time_end' => 'string',
@@ -179,12 +179,12 @@ class EventController extends Controller
         $request->validate([
             'name' => 'string|max:255',
             'description' => 'string|max:255',
-            'classroom_id' => 'string|max:255',
-            'teacher_id' => 'string|max:255',
+            'classroom_id' => 'string|max:255|nullable',
+            'teacher_id' => 'string|max:255|nullable',
             'event_type_id' => 'required|string|max:255',
-            'group_id' => 'string|max:255',
-            'user_id' => 'string|max:255',
-            'department_id' => 'string|max:255',
+            'group_id' => 'string|max:255|nullable',
+            'user_id' => 'string|max:255|nullable',
+            'department_id' => 'string|max:255|nullable',
             'status_id' => 'string|max:255',
             'start_date' => 'string|max:255',
             'end_date' => 'string|max:255',
@@ -211,12 +211,12 @@ class EventController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
-            'classroom_id' => 'string|max:255',
-            'teacher_id' => 'string|max:255',
+            'classroom_id' => 'string|max:255|nullable',
+            'teacher_id' => 'string|max:255|nullable',
             'event_type_id' => 'required|string|max:255',
-            'group_id' => 'string|max:255',
-            'user_id' => 'string|max:255',
-            'department_id' => 'string|max:255',
+            'group_id' => 'string|max:255|nullable',
+            'user_id' => 'string|max:255|nullable',
+            'department_id' => 'string|max:255|nullable',
             'start_date' => 'required|string|max:255',
             'end_date' => 'required|string|max:255',
             'status_id' => 'required|string|max:255',
@@ -249,9 +249,9 @@ class EventController extends Controller
         $request->validate([
             'description' => 'required|string|max:255',
             'classroom_id' => 'required|string|max:255',
-            'teacher_id' => 'required|string|max:255',
+            'teacher_id' => 'required|string|max:255|nullable',
             'event_type_id' => 'required|string|max:255',
-            'department_id' => 'required|string|max:255',
+            'department_id' => 'required|string|max:255|nullable',
             'start_date' => 'required|string|max:255',
             'end_date' => 'required|string|max:255',
             'status_id' => 'required|string|max:255',
