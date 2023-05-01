@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ClassroomNotFoundException;
 use App\Models\Classroom;
 use Illuminate\Contracts\Queue\EntityNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -14,11 +15,11 @@ class ClassroomController extends Controller
     {
         $classrooms = Classroom::query()->with('company')->orderBy('order', 'ASC');
         $user = Auth::user()->toArray();
-
+/*
         if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
             $classrooms->where('company_id', $user['company_id']);
         }
-
+*/
         return response()->json([
             'status' => 'success',
             'data' => $classrooms->get(),
@@ -28,6 +29,10 @@ class ClassroomController extends Controller
     public function find(Request $request, string $id): JsonResponse
     {
         $classroom = Classroom::find($id);
+
+        if (null === $classroom) {
+            throw new ClassroomNotFoundException();
+        }
 
         return response()->json([
             'status' => 'success',
@@ -64,7 +69,7 @@ class ClassroomController extends Controller
         $classroom = Classroom::find($id);
 
         if (null === $classroom) {
-            throw new EntityNotFoundException();
+            throw new ClassroomNotFoundException();
         }
 
         $classroom->update($request->toArray());

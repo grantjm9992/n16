@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\EntityNotFoundException;
+use App\Exceptions\NotAllowedException;
+use App\Exceptions\TeacherNotFoundException;
 use App\Models\Event;
 use App\Models\Holiday;
 use App\Models\Classroom;
@@ -69,14 +72,19 @@ class HolidayController extends Controller
         }
 
         $holiday = Holiday::find($id);
-        if ($holiday === null) {
-            throw new NotFoundHttpException('');
+
+        $teacher = Teacher::find($holiday->teacher_id);
+
+        if ($teacher === null) {
+            throw new TeacherNotFoundException();
+        }
+
+        if (null === $holiday) {
+            throw new \App\Exceptions\EntityNotFoundException('Holiday');
         }
 
         $holiday->status = HolidayStatus::ACCEPTED;
         $holiday->save();
-
-        $teacher = Teacher::find($holiday->teacher_id);
 
         $period = CarbonPeriod::create($holiday->start_date, $holiday->end_date);
         foreach ($period->toArray() as $date) {
@@ -105,10 +113,13 @@ class HolidayController extends Controller
     {
         $user = Auth::user()->toArray();
         if ($user['user_role'] === 'teacher') {
-            throw new MethodNotAllowedException();
+            throw new NotAllowedException();
         }
 
         $holiday = Holiday::find($id);
+        if (null === $holiday) {
+            throw new EntityNotFoundException('Holiday');
+        }
         $holiday->status = HolidayStatus::REJECTED;
         $holiday->save();
 
@@ -119,10 +130,13 @@ class HolidayController extends Controller
     {
         $user = Auth::user()->toArray();
         if ($user['user_role'] === 'teacher') {
-            throw new HttpException(403, 'Method not allowed for user');
+            throw new NotAllowedException();
         }
 
         $holiday = Holiday::find($id);
+        if (null === $holiday) {
+            throw new EntityNotFoundException('Holiday');
+        }
         $holiday->status = HolidayStatus::REJECTED;
         $holiday->save();
 

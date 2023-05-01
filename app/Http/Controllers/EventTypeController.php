@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\CannotDeleteEntityWithEventsException;
 use App\Models\Event;
 use App\Models\EventType;
 use Illuminate\Http\JsonResponse;
@@ -23,6 +24,9 @@ class EventTypeController extends Controller
     public function find(Request $request, string $id): JsonResponse
     {
         $eventType = EventType::find($id);
+        if (null === $eventType) {
+            throw new \App\Exceptions\EntityNotFoundException('Event type');
+        }
 
         return response()->json([
             'status' => 'success',
@@ -55,6 +59,9 @@ class EventTypeController extends Controller
         ]);
 
         $eventType = EventType::find($id);
+        if (null === $eventType) {
+            throw new \App\Exceptions\EntityNotFoundException('Event type');
+        }
         $eventType->update($request->toArray());
         $eventType->save();
 
@@ -67,11 +74,14 @@ class EventTypeController extends Controller
     public function delete(string $id): JsonResponse
     {
         $events = Event::query()->where('event_type_id', $id)->get();
-        if (count($events) > 0) {
-            throw new HttpException(400, 'Cannot delete an event type that is in use');
+        if ($events > 0) {
+            throw new CannotDeleteEntityWithEventsException('Event type');
         }
 
         $eventType = EventType::find($id);
+        if (null === $eventType) {
+            throw new \App\Exceptions\EntityNotFoundException('Event type');
+        }
         $eventType->delete();
 
         return response()->json([

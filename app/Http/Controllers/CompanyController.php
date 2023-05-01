@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\CompanyNotFoundException;
 use App\Models\Company;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -44,6 +45,10 @@ class CompanyController extends Controller
     {
         $company = Company::find($id);
 
+        if (null === $company) {
+            throw new CompanyNotFoundException();
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => $company,
@@ -57,6 +62,11 @@ class CompanyController extends Controller
         ]);
 
         $company = Company::find($id);
+
+        if (null === $company) {
+            throw new CompanyNotFoundException();
+        }
+
         $company->name = $request->name;
         $company->save();
 

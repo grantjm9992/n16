@@ -42,6 +42,9 @@ class TeacherController extends Controller
     public function find(Request $request, string $id): JsonResponse
     {
         $classroom = Teacher::find($id);
+        if (null === $classroom) {
+            throw new \App\Exceptions\EntityNotFoundException('Teacher');
+        }
 
         return response()->json([
             'status' => 'success',
@@ -99,7 +102,7 @@ class TeacherController extends Controller
         $classroom = Teacher::find($id);
 
         if (null === $classroom) {
-            throw new EntityNotFoundException(Teacher::class, $id);
+            throw new \App\Exceptions\EntityNotFoundException('Teacher');
         }
 
         $classroom->update($request->toArray());
@@ -118,10 +121,16 @@ class TeacherController extends Controller
         ]);
 
         $teacher = Teacher::find($id);
+        if (null === $teacher) {
+            throw new \App\Exceptions\EntityNotFoundException('Teacher');
+        }
         $teacher->leave_date = $request->leave_date;
         $teacher->save();
 
         $user = User::find($id);
+        if (null === $user) {
+            throw new \App\Exceptions\EntityNotFoundException('User');
+        }
         $user->delete();
 
         return response()->json([

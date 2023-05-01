@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Classroom;
 use App\Models\Event;
 use App\Models\Group;
+use App\Models\Holiday;
 use App\Models\TeachingHours;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -25,7 +26,7 @@ class EventController extends Controller
 //        }
 
         if ($user['user_role'] === 'teacher' && $request->query->get('my_calendar')) {
-            $events->where('teacher_id', $user['id']);
+            return $this->getMyCalendar($user['id']);
         }
 
         if ($request->query->get('date')) {
@@ -55,10 +56,40 @@ class EventController extends Controller
     public function find(Request $request, string $id): JsonResponse
     {
         $event = Event::find($id);
+        if (null === $event) {
+            throw new \App\Exceptions\EntityNotFoundException('Event');
+        }
 
         return response()->json([
             'status' => 'success',
             'data' => $event,
+        ]);
+    }
+
+    private function getMyCalendar(string $userId): JsonResponse
+    {
+        $events = Event::query()
+            ->where('teacher_id', $userId)
+            ->get()
+            ->all();
+
+        $holidays = Holiday::query()
+            ->where('teacher_id', $userId)
+            ->where('status', 'accepted')
+            ->get()
+            ->all();
+
+        foreach ($holidays as $holiday) {
+            $events[] = [
+                'title' => 'Holiday',
+                'description' => 'Holiday',
+                'start' => Carbon::parse($holiday->start_date)->setTimeFromTimeString('00:00'),
+                'end' => Carbon::parse($holiday->end_date)->setTimeFromTimeString('23:59'),
+            ];
+        }
+
+        return new JsonResponse([
+            'data' => $events,
         ]);
     }
 
@@ -154,9 +185,7 @@ class EventController extends Controller
             'date_range_start' => 'required|string|max:255',
         ]);
         $group = Group::find($groupId);
-        if (null !== $group) {
-            $group->delete();
-        }
+        $group?->delete();
         Event::query()
             ->where('group_id', $groupId)
             ->where('start_date', '>=', Carbon::parse($request->date_range_start)->format('Y-m-d 00:00:00'))
@@ -168,6 +197,9 @@ class EventController extends Controller
     public function delete(string $id): JsonResponse
     {
         $event = Event::find($id);
+        if (null === $event) {
+            throw new \App\Exceptions\EntityNotFoundException('Event');
+        }
         $event->delete();
         return response()->json([
             'status' => 'success',
@@ -238,6 +270,9 @@ class EventController extends Controller
         ]);
 
         $event = Event::find($id);
+        if (null === $event) {
+            throw new \App\Exceptions\EntityNotFoundException('Event');
+        }
         $event->update($request->toArray());
         $event->save();
 
@@ -260,7 +295,7 @@ class EventController extends Controller
         $event = Event::find($id);
 
         if (null === $event) {
-            throw new EntityNotFoundException();
+            throw new \App\Exceptions\EntityNotFoundException('Event');
         }
 
         $event->update($request->toArray());
@@ -280,6 +315,9 @@ class EventController extends Controller
     public function updateClassroom(Request $request, string $id, string $classroomId): JsonResponse
     {
         $event = Event::find($id);
+        if (null === $event) {
+            throw new \App\Exceptions\EntityNotFoundException('Event');
+        }
         if ($event->group_id !== null) {
             Event::query()->where( 'group_id', $event->group_id)->where('start_date', '>=', $event->start_date)->update([
                 'classroom_id' => $classroomId,
@@ -301,6 +339,9 @@ class EventController extends Controller
     public function updateTeacher(Request $request, string $id, string $teacherId): JsonResponse
     {
         $event = Event::find($id);
+        if (null === $event) {
+            throw new \App\Exceptions\EntityNotFoundException('Event');
+        }
         $event->update([
             'teacher_id' => $teacherId,
         ]);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\CannotDeleteEntityWithEventsException;
 use App\Models\Department;
 use App\Models\Event;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
@@ -24,6 +25,10 @@ class DepartmentController extends Controller
     public function find(Request $request, string $id): JsonResponse
     {
         $eventType = Department::find($id);
+
+        if (null === $eventType) {
+            throw new \App\Exceptions\EntityNotFoundException('Department');
+        }
 
         return response()->json([
             'status' => 'success',
@@ -52,6 +57,9 @@ class DepartmentController extends Controller
         ]);
 
         $eventType = Department::find($id);
+        if (null === $eventType) {
+            throw new \App\Exceptions\EntityNotFoundException('Department');
+        }
         $eventType->update($request->toArray());
         $eventType->save();
 
@@ -64,14 +72,14 @@ class DepartmentController extends Controller
     public function delete(string $id): JsonResponse
     {
         $department = Department::find($id);
-        if ($department === null) {
-            throw new EntityNotFoundException(Department::class, $id);
+        if (null === $department) {
+            throw new \App\Exceptions\EntityNotFoundException('Department');
         }
 
         $events = Event::query()->where('department_id', $department->id)
             ->count();
         if ($events > 0) {
-            throw new \HttpException();
+            throw new CannotDeleteEntityWithEventsException('Department');
         }
 
         $department->delete();

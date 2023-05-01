@@ -44,6 +44,9 @@ class UsersController extends Controller
     public function find(string $id): JsonResponse
     {
         $client = User::find($id);
+        if (null === $client) {
+            throw new \App\Exceptions\EntityNotFoundException('User');
+        }
 
         return new JsonResponse([
             'message' => 'success',
@@ -68,6 +71,9 @@ class UsersController extends Controller
         ]);
 
         $client = User::find($id);
+        if (null === $client) {
+            throw new \App\Exceptions\EntityNotFoundException('User');
+        }
         $client->update($request->toArray());
 
         return new JsonResponse([
