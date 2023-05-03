@@ -12,7 +12,12 @@ class AbstractModel extends Model
     {
         parent::boot();
 
-        $user = Auth::user()->toArray();
+        $user = Auth::user();
+        if (null === $user) {
+            return;
+        }
+
+        $user = $user->toArray();
 
         self::created(function(Model $model) use ($user) {
             HistoryService::insertAction($user['id'], 'create', get_class($model), $model->toArray(), $model->toArray());

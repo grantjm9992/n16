@@ -53,7 +53,8 @@ class AuthController extends Controller
             'surname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
-            'companyName' => 'required|string|max:255',
+            'user_role' => 'string',
+            'company_id' => 'required|string|max:255',
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -61,22 +62,14 @@ class AuthController extends Controller
             throw new \Exception('User already exists');
         }
 
-        $company = Company::create([
-            'name' => $request->companyName,
-            'number_of_employees' => $request->numberOfEmployees,
-        ]);
-
         $user = User::create([
             'name' => $request->name,
             'surname' => $request->surname,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'company_id' => $company->id,
-            'user_role' => 'company_admin',
+            'company_id' => $request->company_id,
+            'user_role' => $request->user_role ?? 'admin',
         ]);
-
-        $company->admin_user_id = $user->id;
-        $company->save();
 
         $token = Auth::login($user);
 

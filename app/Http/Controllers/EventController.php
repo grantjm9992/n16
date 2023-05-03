@@ -13,13 +13,19 @@ use Illuminate\Contracts\Queue\EntityNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class EventController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
         $events = Event::query();
-        $user = Auth::user()->toArray();
+        $user = Auth::user();
+        if (null === $user) {
+            throw new UnauthorizedHttpException('');
+        }
+
+        $user = $user->toArray();
 
 //        if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
 //            $events->where('company_id', $user['company_id']);
@@ -40,11 +46,33 @@ class EventController extends Controller
 
         $eventArray = $events->get();
 
+        $holidays = Holiday::query()
+            ->where('status', 'accepted')
+            ->where('start_date', '<=', $date->format('Y-m-d'))
+            ->where('end_date', '>=', $date->format('Y-m-d'))
+            ->get()
+            ->all();
+
         if ($request->query->get('by_teacher')) {
             $eventArray = [];
             foreach ($events->get()->toArray() as $event) {
                 $event['resourceId'] = $event['teacher_id'] ?? null;
                 $eventArray[] = $event;
+            }
+
+            foreach ($holidays as $holiday) {
+                $period = CarbonPeriod::create($holiday->start_date, $holiday->end_date);
+                foreach ($period->toArray() as $date) {
+                    $startDate = $date->clone();
+                    $endDate = $date->clone();
+                    $eventArray[] = [
+                        'title' => 'Holiday',
+                        'description' => 'Holiday',
+                        'start' => $startDate->setTimeFromTimeString('00:00')->format('Y-m-d H:i'),
+                        'end' => $endDate->setTimeFromTimeString('23:59')->format('Y-m-d H:i'),
+                        'resourceId' => $holiday->teacher_id,
+                    ];
+                }
             }
         }
         return response()->json([
