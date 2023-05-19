@@ -19,7 +19,8 @@ class GoogleApiService
 
         $path = config_path().'/google_auth.json';
         $client->setAuthConfig($path);
-
+        $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
+        $client->setHttpClient($guzzleClient);
         $service = new \Google_Service_Sheets($client);
         $spreadsheetId = '1jqunNYUGpGOZ2B4ylSARhoUDgUJSHgHtFUCCEgFwbpA';
         $response = $service->spreadsheets_values->get($spreadsheetId, 'Hoja 1');
