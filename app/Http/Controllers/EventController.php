@@ -71,6 +71,7 @@ class EventController extends Controller
                         'start' => $startDate->setTimeFromTimeString('00:00')->format('Y-m-d H:i'),
                         'end' => $endDate->setTimeFromTimeString('23:59')->format('Y-m-d H:i'),
                         'resourceId' => $holiday->teacher_id,
+                        'display' => 'background',
                     ];
                 }
             }
