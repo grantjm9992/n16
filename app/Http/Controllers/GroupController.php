@@ -62,7 +62,9 @@ class GroupController extends Controller
         $daysOfTheWeekArray = explode(',', $daysOfTheWeek);
         $returnArray = [];
         foreach ($daysOfTheWeekArray as $dayOfTheWeek) {
-            $returnArray[] = self::DAY_SPANISH_INITIAL_TO_NUMBER[$dayOfTheWeek];
+            if (array_key_exists($dayOfTheWeek, self::DAY_SPANISH_INITIAL_TO_NUMBER)) {
+                $returnArray[] = self::DAY_SPANISH_INITIAL_TO_NUMBER[$dayOfTheWeek];
+            }
         }
 
         return $returnArray;
@@ -71,10 +73,10 @@ class GroupController extends Controller
     private static function dateConvert(string $date): string
     {
         $date = DateTime::createFromFormat('d/m/Y', $date);
-        if (!$date) {
-            return '';
+        if ($date) {
+            return $date->format('Y-m-d');
         }
-        return $date->format('Y-m-d');
+        return $date;
     }
 
     private static function convertToArray(array $sheetValues): array
