@@ -71,6 +71,9 @@ class GroupController extends Controller
     private static function dateConvert(string $date): string
     {
         $date = DateTime::createFromFormat('d/m/Y', $date);
+        if (!$date) {
+            return '';
+        }
         return $date->format('Y-m-d');
     }
 
