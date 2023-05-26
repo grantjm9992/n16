@@ -126,16 +126,11 @@ class TeacherController extends Controller
 
     public function delete(Request $request, string $id): JsonResponse
     {
-        $request->validate([
-            'leave_date' => 'string|required',
-        ]);
-
         $teacher = Teacher::find($id);
         if (null === $teacher) {
             throw new \App\Exceptions\EntityNotFoundException('Teacher');
         }
-        $teacher->leave_date = $request->leave_date;
-        $teacher->save();
+        $teacher->delete();
 
         $user = User::find($id);
         if (null === $user) {
