@@ -61,17 +61,22 @@ class TeacherController extends Controller
             'company_id' => 'required|string',
             'text_colour' => 'string',
             'colour' => 'string',
-            'hours' => 'string',
-            'start_date' => 'string',
-            'start_hours' => 'string',
         ]);
+
+        $requestData = $request->toArray();
+        if (array_key_exists('hours', $requestData)) {
+            $requestData['hours'] = strval($requestData['hours']);
+        }
+        if (array_key_exists('start_hours', $requestData)) {
+            $requestData['start_hours'] = strval($requestData['start_hours']);
+        }
 
         $user = User::query()->where('email', $request->email)->first();
         if ($user !== null) {
             throw new HttpException(400, 'Email in use');
         }
 
-        $teacher = Teacher::create($request->toArray());
+        $teacher = Teacher::create($requestData);
 
         $user = $teacher->toArray();
         $user['user_role'] = 'teacher';
