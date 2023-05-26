@@ -95,8 +95,6 @@ class TeacherController extends Controller
             'colour' => 'string',
             'hours' => 'string|nullable',
             'start_date' => 'string|nullable',
-            'leave_date' => 'string|nullable',
-            'start_hours' => 'string|nullable',
         ]);
 
         $classroom = Teacher::find($id);
