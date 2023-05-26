@@ -93,7 +93,7 @@ class TeacherController extends Controller
             'company_id' => 'required|string',
             'text_colour' => 'string',
             'colour' => 'string',
-            'hours' => 'string|nullable',
+            'hours' => 'numeric|nullable',
             'start_date' => 'string|nullable',
         ]);
 
@@ -103,7 +103,14 @@ class TeacherController extends Controller
             throw new \App\Exceptions\EntityNotFoundException('Teacher');
         }
 
-        $classroom->update($request->toArray());
+        $requestData = $request->toArray();
+        if (array_key_exists('hours', $requestData)) {
+            $requestData['hours'] = strval($requestData['hours']);
+        }
+        if (array_key_exists('start_hours', $requestData)) {
+            $requestData['start_hours'] = strval($requestData['start_hours']);
+        }
+        $classroom->update($requestData);
         $classroom->save();
 
         return response()->json([
