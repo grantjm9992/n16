@@ -24,7 +24,8 @@ class AbstractModel extends Model
         });
 
         self::updated(function($model) use ($user) {
-            HistoryService::insertAction($user['id'], 'update', get_class($model), $model->toArray(), $model->toArray());
+
+            HistoryService::insertAction($user['id'], 'update', get_class($model), $model->toArray(), $model->getRawOriginal());
         });
 
         self::deleted(function($model) use ($user) {
