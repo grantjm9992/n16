@@ -28,6 +28,6 @@ License: For each use, you must have a valid license purchased only from themefo
         <div class="spinner"></div>
     </div>
 </app-root>
-<script src="runtime.d4be3f835875a326.js" type="module"></script><script src="polyfills.1a93e57f052fa37c.js" type="module"></script><script src="scripts.fde64f2b91915339.js" defer></script><script src="main.9f9d56baafe6b762.js" type="module"></script>
+<script src="runtime.8bd395ac41c557ae.js" type="module"></script><script src="polyfills.1a93e57f052fa37c.js" type="module"></script><script src="scripts.fde64f2b91915339.js" defer></script><script src="main.9f9d56baafe6b762.js" type="module"></script>
 
 </body></html>

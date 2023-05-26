@@ -109,7 +109,7 @@ Route::middleware('jwt.verify')->group(function() {
         Route::get('{id}', 'find');
         Route::post('', 'create');
         Route::post('{id}', 'update');
-        Route::post('{id}', 'delete');
+        Route::delete('{id}', 'delete');
     });
 
     Route::controller( ResourceController::class)->prefix('resource/')->group(function() {
