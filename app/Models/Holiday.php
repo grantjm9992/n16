@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Holiday extends Model
+class Holiday extends AbstractModel
 {
     use HasFactory;
     use Uuids;
