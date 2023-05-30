@@ -55,6 +55,7 @@ Route::middleware('jwt.verify')->group(function() {
         Route::get('{id}', 'find');
         Route::delete('{id}', 'delete');
         Route::post('{id}', 'update');
+        Route::post('{id}/update-password', 'updatePassword');
         Route::post('', 'create');
     });
 

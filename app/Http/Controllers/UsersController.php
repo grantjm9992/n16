@@ -63,6 +63,21 @@ class UsersController extends Controller
         ]);
     }
 
+    public function updatePassword(Request $request, string $id): JsonResponse
+    {
+        $this->validate($request, [
+            'password' => 'required|string',
+        ]);
+        /** @var User $user */
+        $user = User::find($id);
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+        $user->save();
+
+        return response()->json([]);
+    }
+
     public function update(Request $request, string $id): JsonResponse
     {
         $this->validate($request, [
