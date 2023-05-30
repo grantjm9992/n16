@@ -27,6 +27,7 @@ class UpdateFromLogs extends Command
                     $event->setAttribute('event_type_id', $updatedEntity['event_type_id']);
                     $event->setAttribute('teacher_id', $updatedEntity['teacher_id']);
                 }
+                $event->save();
             }
         }
     }
