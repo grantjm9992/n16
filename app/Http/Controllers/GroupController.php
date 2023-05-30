@@ -88,12 +88,14 @@ class GroupController extends Controller
                 $j = 0;
                 $rowArray = [];
                 foreach ($row as $field) {
-                    $key = self::MAPPING_ARRAY[$j];
-                    if (array_key_exists($key, self::COVERT_ARRAY)) {
-                        $method = self::COVERT_ARRAY[$key];
-                        $field = self::$method($field);
+                    if (array_key_exists($j, self::MAPPING_ARRAY)) {
+                        $key = self::MAPPING_ARRAY[$j];
+                        if (array_key_exists($key, self::COVERT_ARRAY)) {
+                            $method = self::COVERT_ARRAY[$key];
+                            $field = self::$method($field);
+                        }
+                        $rowArray[$key] = $field;
                     }
-                    $rowArray[$key] = $field;
                     $j++;
                 }
                 $returnArray[] = $rowArray;
