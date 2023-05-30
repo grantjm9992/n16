@@ -21,13 +21,17 @@ class UpdateFromLogs extends Command
             if ($log->action === 'update') {
                 $updatedEntity = $log->original_entity;
                 /** @var Event $event */
-                $event = Event::find($updatedEntity['id']);
-                if ($event) {
+                $event = Event::query()
+                    ->where('start_date', $updatedEntity['start_date'])
+                    ->where('end_date', $updatedEntity['end_date'])
+                    ->where('description', $updatedEntity['description'])
+                    ->first();
+                if ($event) {dd(19);
                     $event->setAttribute('department_id', $updatedEntity['department_id']);
                     $event->setAttribute('event_type_id', $updatedEntity['event_type_id']);
                     $event->setAttribute('teacher_id', $updatedEntity['teacher_id']);
+                    $event->save();
                 }
-                $event->save();
             }
         }
     }
