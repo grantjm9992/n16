@@ -20,9 +20,11 @@ class RepeatEventCycle extends Command
             ->all();
 
         foreach ($events as $event) {
-            $dateLimit = Carbon::createFromFormat('Y-m-d H:i', '2023-06-30 23:59');
-            $startDate = Carbon::createFromFormat('Y-m-d H:i', $event->start_date)->addWeeks(2);
-            $endDate = Carbon::createFromFormat('Y-m-d H:i', $event->end_date)->addWeeks(2);
+            $dateLimit = new Carbon('2023-07-31 23:59');
+            $startDate = new Carbon($event->start_date);
+            $endDate = new Carbon($event->end_date);
+            $startDate->addWeeks(2);
+            $endDate->addWeeks(2);
             while ($dateLimit >= $startDate) {
                 $_data = [
                     'company_id' => $event->company_id,
@@ -37,8 +39,8 @@ class RepeatEventCycle extends Command
                     'end_date' => $endDate->format('Y-m-d H:i'),
                 ];
                 $event = Event::create($_data);
-                $startDate->addWeeks(2);
-                $endDate->addWeeks(2);:
+                $startDate->addWeek();
+                $endDate->addWeek();
             }
         }
     }
