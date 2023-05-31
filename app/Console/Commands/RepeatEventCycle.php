@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Ramsey\Uuid\Uuid;
 
 class RepeatEventCycle extends Command
 {
@@ -23,13 +24,12 @@ class RepeatEventCycle extends Command
             $startDate = Carbon::createFromFormat('Y-m-d H:i', $event->start_date)->addWeeks(2);
             $endDate = Carbon::createFromFormat('Y-m-d H:i', $event->end_date)->addWeeks(2);
             while ($dateLimit >= $startDate) {
-                $event = Event::create($event->toArray());
-                $event->update([
-                    'teacher_id' => 'not_set',
-                    'start_date' => $startDate->format('Y-m-d H:i'),
-                    'end_date' => $endDate->format('Y-m-d H:i'),
-                ]);
-                $event->save();
+                $data = $event->toArray();
+                $data['id'] = Uuid::uuid4()->toString();
+                $data['teacher_id'] = 'not_set';
+                $data['start_date'] = $startDate->format('Y-m-d H:i');
+                $data['end_date'] = $endDate->format('Y-m-d H:i');
+                $event = Event::create($data);
                 $startDate->addWeek();
                 $endDate->addWeek();
             }
