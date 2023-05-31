@@ -314,8 +314,8 @@ class EventController extends Controller
             'description' => 'required|string|max:255',
             'classroom_id' => 'required|string|max:255',
             'teacher_id' => 'required|string|max:255|nullable',
-            'event_type_id' => 'required|string|max:255',
-            'department_id' => 'required|string|max:255|nullable',
+            'event_type_id' => 'string|max:255',
+            'department_id' => 'string|max:255|nullable',
             'start_date' => 'required|string|max:255',
             'end_date' => 'required|string|max:255',
             'status_id' => 'required|string|max:255',
@@ -327,15 +327,20 @@ class EventController extends Controller
             throw new \App\Exceptions\EntityNotFoundException('Event');
         }
 
-        if ($request->event_type_id !== $event->event_type_id) {
-            Event::query()->where( 'group_id', $event->group_id)->where('start_date', '>=', $event->start_date)->update([
-                'event_type_id' => $request->event_type_id,
-            ]);
+        if ($request->event_type_id) {
+            if ($request->event_type_id !== $event->event_type_id) {
+                Event::query()->where( 'group_id', $event->group_id)->where('start_date', '>=', $event->start_date)->update([
+                    'event_type_id' => $request->event_type_id,
+                ]);
+            }
         }
-        if ($request->department_id !== $event->department_id) {
-            Event::query()->where( 'group_id', $event->group_id)->where('start_date', '>=', $event->start_date)->update([
-                'department_id' => $request->department_id,
-            ]);
+
+        if ($request->department_id) {
+            if ($request->department_id !== $event->department_id) {
+                Event::query()->where( 'group_id', $event->group_id)->where('start_date', '>=', $event->start_date)->update([
+                    'department_id' => $request->department_id,
+                ]);
+            }
         }
         $event->update($request->toArray());
         if ((int)$request->status_id !== 1) {
