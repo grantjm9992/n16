@@ -24,14 +24,19 @@ class RepeatEventCycle extends Command
             $startDate = Carbon::createFromFormat('Y-m-d H:i', $event->start_date)->addWeeks(2);
             $endDate = Carbon::createFromFormat('Y-m-d H:i', $event->end_date)->addWeeks(2);
             while ($dateLimit >= $startDate) {
-                $data = $event->toArray();
-                $data['id'] = Uuid::uuid4()->toString();
-                $data['teacher_id'] = 'not_set';
-                $data['start_date'] = $startDate->format('Y-m-d H:i');
-                $data['end_date'] = $endDate->format('Y-m-d H:i');
-                $event = Event::create($data);
-                $startDate->addWeek();
-                $endDate->addWeek();
+                $_data = [
+                    'company_id' => $event->company_id,
+                    'description' => $event->description,
+                    'classroom_id' => $event->classroom_id,
+                    'event_type_id' => $event->event_type_id,
+                    'group_id' => $event->group_id,
+                    'department_id' => $event->department_id,
+                    'status_id' => $event->status_id,
+                    'teacher_id' => 'not_set',
+                    'start_date' => $startDate->format('Y-m-d H:i'),
+                    'end_date' => $endDate->format('Y-m-d H:i'),
+                ];
+                $event = Event::create($_data);
             }
         }
     }
