@@ -26,7 +26,7 @@ class UpdateFromLogs extends Command
                     ->where('end_date', $updatedEntity['end_date'])
                     ->where('description', $updatedEntity['description'])
                     ->first();
-                if ($event) {dd(19);
+                if ($event) {
                     $event->setAttribute('department_id', $updatedEntity['department_id']);
                     $event->setAttribute('event_type_id', $updatedEntity['event_type_id']);
                     $event->setAttribute('teacher_id', $updatedEntity['teacher_id']);
