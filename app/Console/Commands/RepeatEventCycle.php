@@ -37,6 +37,8 @@ class RepeatEventCycle extends Command
                     'end_date' => $endDate->format('Y-m-d H:i'),
                 ];
                 $event = Event::create($_data);
+                $startDate->addWeeks(2);
+                $endDate->addWeeks(2);:
             }
         }
     }
