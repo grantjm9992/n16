@@ -14,17 +14,17 @@ class RepeatEventCycle extends Command
     public function handle()
     {
         $events = Event::query()
-            ->where('start_date', '>=', '2023-05-29 00:00')
-            ->where('end_date', '<=', '2023-06-04 23:59')
+            ->where('start_date', '>=', '2023-06-02 00:00')
+            ->where('end_date', '<=', '2023-06-02 23:59')
             ->get()
             ->all();
 
         foreach ($events as $event) {
-            $dateLimit = new Carbon('2023-07-31 23:59');
+            $dateLimit = new Carbon('2023-06-09 23:59');
             $startDate = new Carbon($event->start_date);
             $endDate = new Carbon($event->end_date);
-            $startDate->addWeeks(2);
-            $endDate->addWeeks(2);
+            $startDate->addWeek();
+            $endDate->addWeek();
             while ($dateLimit >= $startDate) {
                 $_data = [
                     'company_id' => $event->company_id,

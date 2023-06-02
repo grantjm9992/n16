@@ -17,6 +17,6 @@ class HistoryLogController extends Controller
         }
 
         $query->orderBy('created_at', 'DESC');
-        return new JsonResponse(['data' => $query->get()->all()]);
+        return new JsonResponse(['data' => $query->limit(1000)->get()]);
     }
 }

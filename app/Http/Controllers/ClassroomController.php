@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ClassroomNotFoundException;
 use App\Models\Classroom;
+use App\Models\Event;
 use Illuminate\Contracts\Queue\EntityNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -78,6 +79,29 @@ class ClassroomController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $classroom,
+        ]);
+    }
+
+    public function delete(Request $request, string $id): JsonResponse
+    {
+        $classroom = Classroom::find($id);
+        if (null === $classroom) {
+            throw new ClassroomNotFoundException();
+        }
+
+        $events = Event::query()
+            ->where('classroom_id', $id)
+            ->get()
+            ->all();
+
+        if (count($events) > 0) {
+            response()->json(['status' => 'Cannot delete classroom with events'], 400);
+        }
+
+        $classroom->delete();
+
+        return response()->json([
+            'status' => 'success',
         ]);
     }
 }
