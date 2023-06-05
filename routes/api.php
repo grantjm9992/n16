@@ -143,7 +143,7 @@ Route::middleware('jwt.verify')->group(function() {
         Route::get('', 'index');
         Route::post('', 'create');
         Route::post('{id}', 'update');
-        Route::get('{id}', 'index');
+        Route::get('{id}', 'find');
         Route::get('{id}/accept', 'accept');
         Route::get('{id}/reject', 'reject');
         Route::get('{id}/revoke', 'revoke');
