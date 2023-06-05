@@ -142,6 +142,8 @@ Route::middleware('jwt.verify')->group(function() {
     Route::controller( HolidayController::class)->prefix('holidays/')->group(function () {
         Route::get('', 'index');
         Route::post('', 'create');
+        Route::post('{id}', 'update');
+        Route::get('{id}', 'index');
         Route::get('{id}/accept', 'accept');
         Route::get('{id}/reject', 'reject');
         Route::get('{id}/revoke', 'revoke');

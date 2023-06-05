@@ -20,6 +20,19 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 class HolidayController extends Controller
 {
+    public function find(string $id): JsonResponse
+    {
+        $holiday = Holiday::find($id);
+
+        if (null === $holiday) {
+            throw new NotFoundHttpException();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $holiday,
+        ]);
+    }
     public function index(Request $request): JsonResponse
     {
         $classrooms = Holiday::query()->with('teacher');
@@ -51,14 +64,36 @@ class HolidayController extends Controller
             'notes' => 'string',
         ]);
         $user = Auth::user()->toArray();
+        $teacherId = $user['id'];
+        $companyId = $user['company_id'];
         if ($user['user_role'] !== 'teacher') {
-            throw new MethodNotAllowedException();
+            if (!$request->teacher_id || $request->teacher_id === null) {
+                throw new MethodNotAllowedException();
+            }
+            $teacherId = $request->teacher_id;
+            $teacher = Teacher::find($teacherId);
+            $companyId = $teacher->company_id;
         }
 
         $holiday = Holiday::create($request->toArray());
-        $holiday->teacher_id = $user['id'];
-        $holiday->company_id = $user['company_id'];
+        $holiday->teacher_id = $teacherId;
+        $holiday->company_id = $companyId;
         $holiday->status = HolidayStatus::PENDING;
+        $holiday->save();
+
+        return new JsonResponse([], 201);
+    }
+
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $request->validate([
+            'start_date' => 'required|string',
+            'end_date' => 'required|string',
+            'notes' => 'string',
+        ]);
+
+        $holiday = Holiday::find($id);
+        $holiday->update($request->toArray());
         $holiday->save();
 
         return new JsonResponse([], 201);
