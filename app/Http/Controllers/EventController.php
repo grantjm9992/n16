@@ -149,8 +149,8 @@ class EventController extends Controller
                 $endDate = $endDate->setTimeFromTimeString($request->time_end);
 
                 Event::create([
-                    'start_date' => $startDate,
-                    'end_date' => $endDate,
+                    'start_date' => $startDate->format('Y-m-d H:i:s'),
+                    'end_date' => $endDate->format('Y-m-d H:i:s'),
                     'description' => $request->name,
                     'classroom_id' => $request->classroom_id,
                     'teacher_id' => $request->teacher_id ?? null,
@@ -167,6 +167,19 @@ class EventController extends Controller
         Group::create([
             'name' => $request->name,
             'data' => json_encode($request->toArray()),
+        ]);
+
+        return new JsonResponse([], 201);
+    }
+
+    public function updateTeacherForGroup(string $id, string $teacherId): JsonResponse
+    {
+        $event = Event::find($id);
+        $event->teacher_id = $teacherId;
+        $event->save();
+
+        Event::query()->where( 'group_id', $event->group_id)->where('start_date', '>=', $event->start_date)->update([
+            'teacher_id' => $teacherId,
         ]);
 
         return new JsonResponse([], 201);
@@ -315,7 +328,7 @@ class EventController extends Controller
             'classroom_id' => 'required|string|max:255',
             'teacher_id' => 'required|string|max:255|nullable',
             'event_type_id' => 'required|string|max:255',
-            'department_id' => 'required|string|max:255|nullable',
+            'department_id' => 'required|string|max:255',
             'start_date' => 'required|string|max:255',
             'end_date' => 'required|string|max:255',
             'status_id' => 'required|string|max:255',

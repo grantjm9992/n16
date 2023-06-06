@@ -100,6 +100,7 @@ Route::middleware('jwt.verify')->group(function() {
         Route::delete('{id}', 'delete');
         Route::post('update-classroom/{id}/{classroomId}', 'updateClassroom');
         Route::post('update-teacher/{id}/{teacherId}', 'updateTeacher');
+        Route::post('update-teacher-for-group/{id}/{teacherId}', 'updateTeacherForGroup');
         Route::post('update-events-for-group/{groupId}', 'updateEventsForGroup');
         Route::post('delete-events-for-group/{groupId}', 'deleteEventsForGroup');
         Route::post('/update-dates/{id}', 'updateDates');
