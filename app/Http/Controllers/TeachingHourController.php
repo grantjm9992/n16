@@ -55,10 +55,10 @@ class TeachingHourController extends Controller
         if ($request->group_by === 'teacher') {
             $teachers = Teacher::query();
             if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
-                $teachers->where('company_id', $user['company_id']);
+                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
             }
             if ($request->query->get('company_id')) {
-                $teachers->where('company_id', $request->query->get('company_id'));
+                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $request->query->get('company_id')]);
             }
             $teachers = $teachers->get();
             $returnArray = [];
@@ -79,10 +79,10 @@ class TeachingHourController extends Controller
         if ($request->group_by === 'teacher_and_event_type') {
             $teachers = Teacher::query();
             if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
-                $teachers->where('company_id', $user['company_id']);
+                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
             }
             if ($request->query->get('company_id')) {
-                $teachers->where('company_id', $request->query->get('company_id'));
+                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $request->query->get('company_id')]);
             }
             $teachers = $teachers->get();
             $returnArray = [];
@@ -96,14 +96,14 @@ class TeachingHourController extends Controller
                         ->where('event_type_id', $eventType->id)
                         ->get()->toArray();
                     $time = round($this->getTotalTimeForEventArray($events)/3600, 2);
-//                    if ($time > 0) {
-                    $returnArray[] = [
-                        'name' => $teacher->name,
-                        'surname' => $teacher->surname,
-                        'event_type' => $eventType->name,
-                        'time' => $time,
-                    ];
-//                    }
+                    if ($time > 0) {
+                        $returnArray[] = [
+                            'name' => $teacher->name,
+                            'surname' => $teacher->surname,
+                            'event_type' => $eventType->name,
+                            'time' => $time,
+                        ];
+                    }
                 }
             }
             return response()->json($returnArray);
@@ -112,10 +112,10 @@ class TeachingHourController extends Controller
         if ($request->group_by === 'teacher_and_department') {
             $teachers = Teacher::query();
             if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
-                $teachers->where('company_id', $user['company_id']);
+                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
             }
             if ($request->query->get('company_id')) {
-                $teachers->where('company_id', $request->query->get('company_id'));
+                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $request->query->get('company_id')]);
             }
             $teachers = $teachers->get();
             $returnArray = [];
@@ -129,14 +129,14 @@ class TeachingHourController extends Controller
                         ->where('department_id', $department->id)
                         ->get()->toArray();
                     $time = round($this->getTotalTimeForEventArray($events)/3600, 2);
-//                    if ($time > 0) {
+                    if ($time > 0) {
                         $returnArray[] = [
                             'name' => $teacher->name,
                             'surname' => $teacher->surname,
                             'department' => $department->name,
                             'time' => $time,
                         ];
-//                    }
+                    }
                 }
             }
             return response()->json($returnArray);

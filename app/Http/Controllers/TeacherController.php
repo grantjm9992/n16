@@ -26,11 +26,11 @@ class TeacherController extends Controller
         $user = Auth::user()->toArray();
 
         if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
-            $classrooms->where('company_id', $user['company_id']);
+            $classrooms->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
         }
 
         if ($request->query->get('company_id')) {
-            $classrooms->where('company_id', $request->query->get('company_id'));
+            $classrooms->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
         }
 
         return response()->json([

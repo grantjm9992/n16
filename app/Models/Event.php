@@ -18,6 +18,8 @@ class Event extends AbstractModel
         'start', 'end', 'resourceId', 'title', 'backgroundColor', 'textColor', 'borderColor',
     ];
 
+    protected $guarded = ['id'];
+
     public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class);
