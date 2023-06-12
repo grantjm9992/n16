@@ -25,7 +25,7 @@ class TeacherController extends Controller
 
         $user = Auth::user()->toArray();
 
-        if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
+        if (!in_array($user['user_role'], ['super_admin', 'admin', 'director'])) {
             $classrooms->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
         }
 
