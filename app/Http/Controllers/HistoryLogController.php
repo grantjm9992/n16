@@ -11,9 +11,12 @@ class HistoryLogController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = History::query();
-        // company_id, user_id, action, entity
-        foreach ($request->query->all() as $key => $value) {
-            $query->where($key, $value);
+
+        if ($request->query->get('user_id')) {
+            $query->where('user_id', $request->query->get('user_id'));
+        }
+        if ($request->query->get('q')) {
+            $query->where('original_entity', 'LIKE', "%". $request->query->get('q'). "%");
         }
 
         $query->orderBy('created_at', 'DESC');

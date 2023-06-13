@@ -352,7 +352,7 @@ class EventController extends Controller
             ]);
         }
         $event->update($request->toArray());
-        if ((int)$request->status_id !== 1) {
+        if ((int)$request->status_id === 2) {
             $event->update([
                 'teacher_id' => 'not_set',
             ]);
