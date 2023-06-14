@@ -62,8 +62,6 @@ class ClassroomController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'company_id' => 'required|string|max:255',
-            'text_colour' => 'string',
-            'fill_colour' => 'string',
             'order' => 'integer',
         ]);
 
