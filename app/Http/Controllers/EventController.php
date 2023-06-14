@@ -371,11 +371,6 @@ class EventController extends Controller
         if (null === $event) {
             throw new \App\Exceptions\EntityNotFoundException('Event');
         }
-        if ($event->group_id !== null) {
-            Event::query()->where( 'group_id', $event->group_id)->where('start_date', '>=', $event->start_date)->update([
-                'classroom_id' => $classroomId,
-            ]);
-        }
 
         if ($event->group_id === null) {
             $event->update([
