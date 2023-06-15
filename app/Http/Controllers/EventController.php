@@ -372,12 +372,10 @@ class EventController extends Controller
             throw new \App\Exceptions\EntityNotFoundException('Event');
         }
 
-        if ($event->group_id === null) {
-            $event->update([
-                'classroom_id' => $classroomId,
-            ]);
-            $event->save();
-        }
+        $event->update([
+            'classroom_id' => $classroomId,
+        ]);
+        $event->save();
 
         return new JsonResponse([
             'data' => $event,
