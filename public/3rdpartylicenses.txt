@@ -214,6 +214,9 @@ SEE LICENSE IN LICENSE.md
 @fullcalendar/resource-timegrid
 SEE LICENSE IN LICENSE.md
 
+@fullcalendar/scrollgrid
+SEE LICENSE IN LICENSE.md
+
 @fullcalendar/timegrid
 MIT
 MIT License

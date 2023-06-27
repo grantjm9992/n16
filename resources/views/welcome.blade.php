@@ -1,5 +1,14 @@
-<!DOCTYPE html>
-    <html lang="en"><head>
+<!DOCTYPE html><!--
+
+Theme: NobleUI - Angular Admin Template
+Author: NobleUI
+Website: https://www.nobleui.com
+Portfolio: https://themeforest.net/user/nobleui/portfolio
+Contact: nobleui123@gmail.com
+Purchase: https://1.envato.market/nobleui_angular
+License: For each use, you must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.
+
+--><html lang="en"><head>
     <meta charset="utf-8">
     <title>Timetable - N16</title>
     <base href="/">
@@ -19,6 +28,6 @@
         <div class="spinner"></div>
     </div>
 </app-root>
-<script src="runtime.332e3899a814a02d.js" type="module"></script><script src="polyfills.1a93e57f052fa37c.js" type="module"></script><script src="scripts.fde64f2b91915339.js" defer></script><script src="main.ff437d65e7a9e629.js" type="module"></script>
+<script src="runtime.f2bd889d8661eb39.js" type="module"></script><script src="polyfills.1a93e57f052fa37c.js" type="module"></script><script src="scripts.fde64f2b91915339.js" defer></script><script src="main.62e8141cfa81041a.js" type="module"></script>
 
 </body></html>

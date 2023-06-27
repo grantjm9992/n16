@@ -315,7 +315,10 @@ class EventController extends Controller
         if (null === $event) {
             throw new \App\Exceptions\EntityNotFoundException('Event');
         }
-        $event->update($request->toArray());
+        $event->update([
+            'start_date' => Carbon::parse($request->start_date)->format('Y-m-d H:i'),
+            'end_date' => Carbon::parse($request->end_date)->format('Y-m-d H:i'),
+        ]);
         $event->save();
 
         return new JsonResponse([], 201);
