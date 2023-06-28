@@ -138,6 +138,7 @@ Route::middleware('jwt.verify')->group(function() {
 
     Route::controller( HistoryLogController::class)->prefix('history-log/')->group(function () {
         Route::get('', 'index');
+        Route::get('event', 'event');
     });
 
     Route::controller( HolidayController::class)->prefix('holidays/')->group(function () {

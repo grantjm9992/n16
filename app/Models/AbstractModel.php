@@ -27,16 +27,20 @@ class AbstractModel extends Model
             $toArray = $model->toArray();
             $rawOriginal = $model->getRawOriginal();
             if (get_class($model) === Event::class) {
-                $toArrayTeacher = Teacher::find($toArray['teacher_id']);
-                $rawOriginalTeacher = Teacher::find($rawOriginal['teacher_id']);
-                if ($toArrayTeacher) {
-                    $toArray['teacher_name'] = $toArrayTeacher['name'] . $toArrayTeacher['surname'];
-                }
-                if ($rawOriginalTeacher) {
-                    $rawOriginal['teacher_name'] = $rawOriginalTeacher['name'] . $rawOriginalTeacher['surname'];
-                }
+                HistoryService::insertEventLog(
+                    $user['id'],
+                    $toArray['id'],
+                    $toArray['description'],
+                    $rawOriginal['teacher_id'],
+                    $toArray['teacher_id'],
+                    $rawOriginal['classroom_id'],
+                    $toArray['classroom_id'],
+                    $rawOriginal['start_date'],
+                    $toArray['start_date']
+                );
+            } else {
+                HistoryService::insertAction($user['id'], 'update', get_class($model), $toArray, $rawOriginal);
             }
-            HistoryService::insertAction($user['id'], 'update', get_class($model), $toArray, $rawOriginal);
         });
 
         self::deleted(function($model) use ($user) {
