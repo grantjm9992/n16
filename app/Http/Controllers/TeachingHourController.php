@@ -168,7 +168,7 @@ class TeachingHourController extends Controller
     private function byTeacherAndEventType($request, $user): array
     {
         $teachers = $this->getTeachers($request, $user);
-        $eventTypes = Department::all();
+        $eventTypes = EventType::all();
         $events = Event::query()
             ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
             ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
