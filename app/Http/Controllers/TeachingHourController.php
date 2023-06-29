@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\EventType;
 use App\Models\Teacher;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -53,93 +54,15 @@ class TeachingHourController extends Controller
         $user = Auth::user()->toArray();
 
         if ($request->group_by === 'teacher') {
-            $teachers = Teacher::query();
-            if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
-                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
-            }
-            if ($request->query->get('company_id')) {
-                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $request->query->get('company_id')]);
-            }
-            $teachers = $teachers->get();
-            $returnArray = [];
-            foreach ($teachers as $teacher) {
-                $events = Event::query()
-                    ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
-                    ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
-                    ->where('teacher_id', $teacher->id)
-                    ->get()->toArray();
-                $_teacher = $teacher->toArray();
-                $_teacher['time'] = round($this->getTotalTimeForEventArray($events)/3600, 2);
-                $returnArray[] = $_teacher;
-            }
-
-            return response()->json($returnArray);
+            return response()->json($this->byTeacher($request, $user));
         }
 
         if ($request->group_by === 'teacher_and_event_type') {
-            $teachers = Teacher::query();
-            if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
-                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
-            }
-            if ($request->query->get('company_id')) {
-                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $request->query->get('company_id')]);
-            }
-            $teachers = $teachers->get();
-            $returnArray = [];
-            $eventTypes = EventType::all();
-            foreach ($teachers as $teacher) {
-                foreach ($eventTypes as $eventType) {
-                    $events = Event::query()
-                        ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
-                        ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
-                        ->where('teacher_id', $teacher->id)
-                        ->where('event_type_id', $eventType->id)
-                        ->get()->toArray();
-                    $time = round($this->getTotalTimeForEventArray($events)/3600, 2);
-                    if ($time > 0) {
-                        $returnArray[] = [
-                            'name' => $teacher->name,
-                            'surname' => $teacher->surname,
-                            'event_type' => $eventType->name,
-                            'time' => $time,
-                        ];
-                    }
-                }
-            }
-            return response()->json($returnArray);
+            return response()->json($this->byTeacherAndEventType($request, $user));
         }
 
         if ($request->group_by === 'teacher_and_department') {
-            $teachers = Teacher::query();
-            if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
-                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
-            }
-            if ($request->query->get('company_id')) {
-                $teachers->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $request->query->get('company_id')]);
-            }
-            $teachers = $teachers->get();
-            $returnArray = [];
-            $departments = Department::all();
-            foreach ($teachers as $teacher) {
-                foreach ($departments as $department) {
-                    $events = Event::query()
-                        ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
-                        ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
-                        ->where('teacher_id', $teacher->id)
-                        ->where('department_id', $department->id)
-                        ->get()->toArray();
-                    $time = round($this->getTotalTimeForEventArray($events)/3600, 2);
-                    if ($time > 0) {
-                        $returnArray[] = [
-                            'name' => $teacher->name,
-                            'surname' => $teacher->surname,
-                            'department' => $department->name,
-                            'time' => $time,
-                        ];
-                    }
-                }
-            }
-            return response()->json($returnArray);
+            return response()->json($this->byTeacherAndDepartment($request, $user));
         }
 
         if ($request->group_by === 'department') {
@@ -168,6 +91,107 @@ class TeachingHourController extends Controller
         }
 
         return response()->json([]);
+    }
+
+    private function getTeachers($request, $user): Collection|array
+    {
+        $teachers = Teacher::query();
+        if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
+            $teachers->whereRaw(
+                '(company_id = :company_id OR company_id = "not_set")',
+                ['company_id' => $user['company_id']]
+            );
+        }
+        if ($request->query->get('company_id')) {
+            $teachers->whereRaw(
+                '(company_id = :company_id OR company_id = "not_set")',
+                ['company_id' => $request->query->get('company_id')]
+            );
+        }
+        return $teachers->get();
+    }
+
+    private function byTeacher(Request $request, $user): array
+    {
+        $teachers = $this->getTeachers($request, $user);
+        $events = Event::query()
+            ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
+            ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
+            ->get()->toArray();
+        $returnArray = [];
+        foreach ($teachers as $teacher) {
+            $eventArray = array_filter($events, function ($event) use ($teacher) {
+                return $event['teacher_id'] === $teacher->id;
+            });
+            $time = round($this->getTotalTimeForEventArray($eventArray)/3600, 2);
+            if ($time > 0) {
+                $returnArray[] = [
+                    'name' => $teacher->name,
+                    'surname' => $teacher->surname,
+                    'time' => $time,
+                ];
+            }
+        }
+
+        return $returnArray;
+    }
+
+    private function byTeacherAndDepartment(Request $request, $user): array
+    {
+        $teachers = $this->getTeachers($request, $user);
+        $departments = Department::all();
+        $events = Event::query()
+            ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
+            ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
+            ->get()->toArray();
+        $returnArray = [];
+        foreach ($teachers as $teacher) {
+            foreach ($departments as $department) {
+                $eventArray = array_filter($events, function ($event) use ($teacher, $department) {
+                    return $event['teacher_id'] === $teacher->id && $event['department_id'] === $department->id;
+                });
+                $time = round($this->getTotalTimeForEventArray($eventArray)/3600, 2);
+                if ($time > 0) {
+                    $returnArray[] = [
+                        'name' => $teacher->name,
+                        'surname' => $teacher->surname,
+                        'department' => $department->name,
+                        'time' => $time,
+                    ];
+                }
+            }
+        }
+
+        return $returnArray;
+    }
+
+    private function byTeacherAndEventType($request, $user): array
+    {
+        $teachers = $this->getTeachers($request, $user);
+        $eventTypes = Department::all();
+        $events = Event::query()
+            ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
+            ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
+            ->get()->toArray();
+        $returnArray = [];
+        foreach ($teachers as $teacher) {
+            foreach ($eventTypes as $eventType) {
+                $eventArray = array_filter($events, function ($event) use ($teacher, $eventType) {
+                    return $event['teacher_id'] === $teacher->id && $event['event_type_id'] === $eventType->id;
+                });
+                $time = round($this->getTotalTimeForEventArray($eventArray)/3600, 2);
+                if ($time > 0) {
+                    $returnArray[] = [
+                        'name' => $teacher->name,
+                        'surname' => $teacher->surname,
+                        'event_type' => $eventType->name,
+                        'time' => $time,
+                    ];
+                }
+            }
+        }
+
+        return $returnArray;
     }
 
     private function getTotalTimeForEventArray(array $events): int
