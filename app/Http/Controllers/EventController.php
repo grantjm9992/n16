@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Group;
 use App\Models\Holiday;
 use App\Models\TeachingHours;
+use App\Services\HistoryService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Contracts\Queue\EntityNotFoundException;
@@ -223,6 +224,7 @@ class EventController extends Controller
 
     public function deleteEventsForGroup(Request $request, string $groupId): JsonResponse
     {
+        $user = Auth::user()->toArray();
         $request->validate([
             'date_range_start' => 'required|string|max:255',
         ]);
@@ -232,6 +234,8 @@ class EventController extends Controller
             ->where('group_id', $groupId)
             ->where('start_date', '>=', Carbon::parse($request->date_range_start)->format('Y-m-d 00:00:00'))
             ->delete();
+
+        HistoryService::insertAction($user['id'], 'delete', Event::class, ['group_id' => $groupId], ['group_id' => $groupId]);
 
         return new JsonResponse([], 201);
     }
