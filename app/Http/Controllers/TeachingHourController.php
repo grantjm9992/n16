@@ -140,8 +140,8 @@ class TeachingHourController extends Controller
     {
         $query = Event::query()
             ->select('events.start_date', 'events.end_date', 'events.teacher_id', 'events.department_id', 'teachers.name', 'teachers.surname', 'departments.name AS department')
-            ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
-            ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
+            ->where('events.start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
+            ->where('events.end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
             ->leftJoin('departments', 'id', '=', 'department_id')
             ->leftJoin('teachers', 'id', '=', 'teacher_id');
 
