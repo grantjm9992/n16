@@ -147,8 +147,8 @@ class TeachingHourController extends Controller
 
         if ($request->query->get('company_id')) {
             $query->whereRaw(
-                '(teachers.company_id = :company_id OR teachers.company_id = "not_set")',
-                ['company_id' => $request->query->get('company_id')]
+                '(teachers.company_id = ? OR teachers.company_id = "not_set")',
+                [$request->query->get('company_id')]
             );
         }
         $events = $query->get()->toArray();
