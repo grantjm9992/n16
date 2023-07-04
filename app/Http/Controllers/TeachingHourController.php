@@ -113,22 +113,29 @@ class TeachingHourController extends Controller
 
     private function byTeacher(Request $request, $user): array
     {
-        $teachers = $this->getTeachers($request, $user);
-        $events = Event::query()
-            ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
-            ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
-            ->get()->toArray();
+        $query = Event::query()
+            ->select('events.start_date', 'events.end_date', 'events.teacher_id', 'teachers.name', 'teachers.surname')
+            ->where('events.start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
+            ->where('events.end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
+            ->leftJoin('teachers', 'teachers.id', '=', 'events.teacher_id');
+        if ($request->query->get('company_id')) {
+            $query->whereRaw(
+                '(teachers.company_id = ? OR teachers.company_id = "not_set")',
+                [$request->query->get('company_id')]
+            );
+        }
         $returnArray = [];
-        foreach ($teachers as $teacher) {
-            $eventArray = array_filter($events, function ($event) use ($teacher) {
-                return $event['teacher_id'] === $teacher->id;
-            });
-            $time = round($this->getTotalTimeForEventArray($eventArray)/3600, 2);
-            if ($time > 0) {
-                $returnArray[] = [
-                    'name' => $teacher->name,
-                    'surname' => $teacher->surname,
-                    'time' => $time,
+        $events = $query->get()->toArray();
+        $toggleArray = [];
+        foreach ($events as $event) {
+            $key = $event['teacher_id'];
+            if (array_key_exists($key, $toggleArray)) {
+                $toggleArray[$key]['time'] += round($this->getTotalTimeForEventArray([$event])/3600, 2);
+            } else {
+                $toggleArray[$key] = [
+                    'name' => $event['name'],
+                    'surname' => $event['surname'],
+                    'time' => round($this->getTotalTimeForEventArray([$event])/3600, 2),
                 ];
             }
         }
@@ -176,28 +183,39 @@ class TeachingHourController extends Controller
 
     private function byTeacherAndEventType($request, $user): array
     {
-        $teachers = $this->getTeachers($request, $user);
-        $eventTypes = EventType::all();
-        $events = Event::query()
+        $query = Event::query()
+            ->select('events.start_date', 'events.end_date', 'events.teacher_id', 'events.event_type_id', 'teachers.name', 'teachers.surname', 'event_types.name AS event_type')
             ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
             ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
-            ->get()->toArray();
+            ->leftJoin('event_types', 'event_types.id', '=', 'events.event_type_id')
+            ->leftJoin('teachers', 'teachers.id', '=', 'events.teacher_id');
+
+        if ($request->query->get('company_id')) {
+            $query->whereRaw(
+                '(teachers.company_id = ? OR teachers.company_id = "not_set")',
+                [$request->query->get('company_id')]
+            );
+        }
+
+        $events = $query->get()->toArray();
         $returnArray = [];
-        foreach ($teachers as $teacher) {
-            foreach ($eventTypes as $eventType) {
-                $eventArray = array_filter($events, function ($event) use ($teacher, $eventType) {
-                    return $event['teacher_id'] === $teacher->id && $event['event_type_id'] === $eventType->id;
-                });
-                $time = round($this->getTotalTimeForEventArray($eventArray)/3600, 2);
-                if ($time > 0) {
-                    $returnArray[] = [
-                        'name' => $teacher->name,
-                        'surname' => $teacher->surname,
-                        'event_type' => $eventType->name,
-                        'time' => $time,
-                    ];
-                }
+        $toggleArray = [];
+        foreach ($events as $event) {
+            $key = $event['teacher_id'].'-'.$event['event_type_id'];
+            if (array_key_exists($key, $toggleArray)) {
+                $toggleArray[$key]['time'] += round($this->getTotalTimeForEventArray([$event])/3600, 2);
+            } else {
+                $toggleArray[$key] = [
+                    'name' => $event['name'],
+                    'surname' => $event['surname'],
+                    'event_type' => $event['event_type'],
+                    'time' => round($this->getTotalTimeForEventArray([$event])/3600, 2),
+                ];
             }
+        }
+
+        foreach ($toggleArray as $key => $value) {
+            $returnArray[] = $value;
         }
 
         return $returnArray;
