@@ -138,30 +138,39 @@ class TeachingHourController extends Controller
 
     private function byTeacherAndDepartment(Request $request, $user): array
     {
-        $teachers = $this->getTeachers($request, $user);
-        $departments = Department::all();
-        $events = Event::query()
+        $query = Event::query()
+            ->select('event.start_date, event.end_date, event.teacher_id, event.department_id, teacher.name, teacher.surname, department.name AS department')
             ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
             ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
-            ->get()->toArray();
+            ->leftJoin('departments', 'id', '=', 'department_id')
+            ->leftJoin('teachers', 'id', '=', 'teacher_id');
+
+        if ($request->query->get('company_id')) {
+            $query->whereRaw(
+                '(teachers.company_id = :company_id OR teachers.company_id = "not_set")',
+                ['company_id' => $request->query->get('company_id')]
+            );
+        }
+        $events = $query->get()->toArray();
         $returnArray = [];
-        foreach ($teachers as $teacher) {
-            foreach ($departments as $department) {
-                $eventArray = array_filter($events, function ($event) use ($teacher, $department) {
-                    return $event['teacher_id'] === $teacher->id && $event['department_id'] === $department->id;
-                });
-                $time = round($this->getTotalTimeForEventArray($eventArray)/3600, 2);
-                if ($time > 0) {
-                    $returnArray[] = [
-                        'name' => $teacher->name,
-                        'surname' => $teacher->surname,
-                        'department' => $department->name,
-                        'time' => $time,
-                    ];
-                }
+        $toggleArray = [];
+        foreach ($events as $event) {
+            $key = $event['teacher_id'].'-'.$event['department_id'];
+            if (array_key_exists($key, $toggleArray)) {
+                $toggleArray[$key]['time'] += round($this->getTotalTimeForEventArray([$event])/3600, 2);
+            } else {
+                $toggleArray[$key] = [
+                    'name' => $event['name'],
+                    'surname' => $event['surname'],
+                    'department' => $event['department'],
+                    'time' => round($this->getTotalTimeForEventArray([$event])/3600, 2),
+                ];
             }
         }
 
+        foreach ($toggleArray as $key => $value) {
+            $returnArray[] = $value;
+        }
         return $returnArray;
     }
 
