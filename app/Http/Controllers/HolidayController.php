@@ -78,6 +78,7 @@ class HolidayController extends Controller
         $holiday = Holiday::create($request->toArray());
         $holiday->teacher_id = $teacherId;
         $holiday->company_id = $companyId;
+        $holiday->absence_type = $request->absence_type ?? 'holiday';
         $holiday->status = HolidayStatus::PENDING;
         $holiday->save();
 
@@ -94,6 +95,7 @@ class HolidayController extends Controller
 
         $holiday = Holiday::find($id);
         $holiday->update($request->toArray());
+        $holiday->absence_type = $request->absence_type ?? 'holiday';
         $holiday->save();
 
         return new JsonResponse([], 201);

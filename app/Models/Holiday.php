@@ -20,6 +20,7 @@ class Holiday extends AbstractModel
         'end_date',
         'notes',
         'status',
+        'absence_type',
     ];
 
     public function teacher(): BelongsTo

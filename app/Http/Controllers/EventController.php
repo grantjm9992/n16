@@ -222,6 +222,24 @@ class EventController extends Controller
         return new JsonResponse([], 201);
     }
 
+    public function suspendEventsForDayForCompany(Request $request, string $companyId, string $day): JsonResponse
+    {
+        $user = Auth::user()->toArray();
+        Event::query()
+            ->join('classrooms', 'classrooms.id', '=', 'events.classroom_id')
+            ->where('classrooms.company_id', $companyId)
+            ->where('start_date', '>=', Carbon::parse($day)->format('Y-m-d 00:00'))
+            ->where('start_date', '<=', Carbon::parse($day)->format('Y-m-d 23:59'))
+            ->update([
+                'status_id' => 2,
+                'teacher_id' => 'not_set',
+            ]);
+
+        HistoryService::insertEventLog($user['id'], 'company_id-'.$companyId, 'UPDATE FOR COMPANY', '', 'not_set', '', '', '', '');
+
+        return response()->json();
+    }
+
     public function deleteEventsForGroup(Request $request, string $groupId): JsonResponse
     {
         $user = Auth::user()->toArray();

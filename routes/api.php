@@ -103,6 +103,7 @@ Route::middleware('jwt.verify')->group(function() {
         Route::post('update-teacher-for-group/{id}/{teacherId}', 'updateTeacherForGroup');
         Route::post('update-events-for-group/{groupId}', 'updateEventsForGroup');
         Route::post('delete-events-for-group/{groupId}', 'deleteEventsForGroup');
+        Route::post('suspend-events/{companyId}/{day}', 'suspendEventsForDayForCompany');
         Route::post('/update-dates/{id}', 'updateDates');
     });
 
