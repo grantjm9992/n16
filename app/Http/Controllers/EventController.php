@@ -47,13 +47,6 @@ class EventController extends Controller
 
         $eventArray = $events->get();
 
-        $holidays = Holiday::query()
-            ->where('status', 'accepted')
-            ->where('start_date', '<=', $date->format('Y-m-d'))
-            ->where('end_date', '>=', $date->format('Y-m-d'))
-            ->get()
-            ->all();
-
         if ($request->query->get('by_teacher')) {
             $eventArray = [];
             foreach ($events->get()->toArray() as $event) {
@@ -61,14 +54,21 @@ class EventController extends Controller
                 $eventArray[] = $event;
             }
 
+            $holidays = Holiday::query()
+                ->where('status', 'accepted')
+                ->where('start_date', '<=', $date->format('Y-m-d'))
+                ->where('end_date', '>=', $date->format('Y-m-d'))
+                ->get()
+                ->all();
+
             foreach ($holidays as $holiday) {
                 $period = CarbonPeriod::create($holiday->start_date, $holiday->end_date);
                 foreach ($period->toArray() as $date) {
                     $startDate = $date->clone();
                     $endDate = $date->clone();
                     $eventArray[] = [
-                        'title' => 'Holiday',
-                        'description' => 'Holiday',
+                        'title' => $holiday->absence_type,
+                        'description' => $holiday->absence_type,
                         'start' => $startDate->setTimeFromTimeString('00:00')->format('Y-m-d H:i'),
                         'end' => $endDate->setTimeFromTimeString('23:59')->format('Y-m-d H:i'),
                         'resourceId' => $holiday->teacher_id,
