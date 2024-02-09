@@ -47,7 +47,7 @@ class HolidayController extends Controller
         }
 
         if ($user['user_role'] === 'teacher') {
-            $classrooms->where('teacher_id', $user['id']);
+            $classrooms->where('teacher_id', $user['_id']);
         }
 
         return response()->json([
@@ -64,7 +64,7 @@ class HolidayController extends Controller
             'notes' => 'string',
         ]);
         $user = Auth::user()->toArray();
-        $teacherId = $user['id'];
+        $teacherId = $user['_id'];
         $companyId = $user['company_id'];
         if ($user['user_role'] !== 'teacher') {
             if (!$request->teacher_id || $request->teacher_id === null) {

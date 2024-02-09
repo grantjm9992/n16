@@ -4,14 +4,16 @@ namespace App\Models;
 
 use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model;
 
 class History extends Model
 {
     use HasFactory;
     use Uuids;
 
-    protected $table = 'history';
+    protected $collection = 'history';
+    protected $connection = 'mongodb';
 
     protected $casts = [
         'original_entity' => 'array',

@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use App\Traits\Uuids;
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model;
 
 class EventChangeLog extends Model
 {
     use Uuids;
+    protected $connection = 'mongodb';
 
-    protected $table = 'event_change_log';
+    protected $collection = 'event_change_log';
     // protected $connection = 'mongodb';
     protected $fillable = [
         'user',

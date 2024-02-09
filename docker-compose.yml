@@ -47,6 +47,21 @@ services:
         - ./docker/dev/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
       networks:
         - laravel
+    mongo:
+      image: mongo
+      restart: always
+      container_name: ${COMPOSE_PROJECT_NAME}_mongo
+      ports:
+        - "27018:27017"
+      expose:
+        - 27018
+      volumes:
+        - ./storage/mongodb_data:/data/db
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: root
+      networks:
+        - laravel
 
 networks:
   laravel:

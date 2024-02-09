@@ -23,23 +23,24 @@
 	"require": {
 		"php": "^8.1",
 		"ext-ctype": "*",
+		"ext-curl": "*",
 		"ext-iconv": "*",
 		"ext-json": "*",
 		"ext-mbstring": "*",
 		"ext-pdo": "*",
 		"ext-pdo_mysql": "*",
 		"backpack/crud": "^5.4",
-		"google/apiclient": "^2.12.1",
+		"google/apiclient": "*",
 		"guzzlehttp/guzzle": "^7.4",
 		"jaybizzle/laravel-migrations-organiser": "^6.2",
 		"laravel/framework": "^9.19",
 		"laravel/sanctum": "^3.0",
 		"laravel/tinker": "^2.7",
+		"mongodb/laravel-mongodb": "*",
 		"php-open-source-saver/jwt-auth": "^2.0",
 		"podio-community/podio-php": "^6.1",
-		"ramsey/uuid": "^4.6",
-      "ext-curl": "*"
-    },
+		"ramsey/uuid": "^4.6"
+	},
 	"require-dev": {
 		"backpack/generators": "^3.3",
 		"bamarni/composer-bin-plugin": "^1.8",

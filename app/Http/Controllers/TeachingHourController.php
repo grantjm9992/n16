@@ -97,16 +97,19 @@ class TeachingHourController extends Controller
     {
         $teachers = Teacher::query();
         if (!in_array($user['user_role'], ['super_admin', 'admin'])) {
-            $teachers->whereRaw(
-                '(company_id = :company_id OR company_id = "not_set")',
-                ['company_id' => $user['company_id']]
-            );
+            $teachers
+                ->where(function ($query) use ($user) {
+                    $query->where('company_id', $user['company_id'])
+                        ->orWhere('company_id', 'not_set');
+                });
         }
         if ($request->query->get('company_id')) {
-            $teachers->whereRaw(
-                '(company_id = :company_id OR company_id = "not_set")',
-                ['company_id' => $request->query->get('company_id')]
-            );
+
+            $teachers
+                ->where(function ($query) use ($request) {
+                    $query->where('company_id', $request->query->get('company_id'))
+                        ->orWhere('company_id', 'not_set');
+                });
         }
         return $teachers->get();
     }
@@ -119,10 +122,11 @@ class TeachingHourController extends Controller
             ->where('events.end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
             ->leftJoin('teachers', 'teachers.id', '=', 'events.teacher_id');
         if ($request->query->get('company_id')) {
-            $query->whereRaw(
-                '(teachers.company_id = ? OR teachers.company_id = "not_set")',
-                [$request->query->get('company_id')]
-            );
+            $query
+                ->where(function ($query) use ($request) {
+                    $query->where('teachers.company_id', $request->query->get('company_id'))
+                        ->orWhere('teachers.company_id', 'not_set');
+                });
         }
         $returnArray = [];
         $events = $query->get()->toArray();
@@ -157,10 +161,11 @@ class TeachingHourController extends Controller
             ->leftJoin('teachers', 'teachers.id', '=', 'events.teacher_id');
 
         if ($request->query->get('company_id')) {
-            $query->whereRaw(
-                '(teachers.company_id = ? OR teachers.company_id = "not_set")',
-                [$request->query->get('company_id')]
-            );
+            $query
+                ->where(function ($query) use ($request) {
+                    $query->where('teachers.company_id', $request->query->get('company_id'))
+                        ->orWhere('teachers.company_id', 'not_set');
+                });
         }
         $events = $query->get()->toArray();
         $returnArray = [];
@@ -195,10 +200,12 @@ class TeachingHourController extends Controller
             ->leftJoin('teachers', 'teachers.id', '=', 'events.teacher_id');
 
         if ($request->query->get('company_id')) {
-            $query->whereRaw(
-                '(teachers.company_id = ? OR teachers.company_id = "not_set")',
-                [$request->query->get('company_id')]
-            );
+
+            $query
+                ->where(function ($query) use ($request) {
+                    $query->where('teachers.company_id', $request->query->get('company_id'))
+                        ->orWhere('teachers.company_id', 'not_set');
+                });
         }
 
         $events = $query->get()->toArray();

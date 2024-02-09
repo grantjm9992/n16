@@ -33,7 +33,7 @@ class EventController extends Controller
 //        }
 
         if ($user['user_role'] === 'teacher' && $request->query->get('my_calendar')) {
-            return $this->getMyCalendar($user['id']);
+            return $this->getMyCalendar($user['_id']);
         }
 
         if ($request->query->get('date')) {
@@ -235,7 +235,7 @@ class EventController extends Controller
                 'teacher_id' => 'not_set',
             ]);
 
-        HistoryService::insertEventLog($user['id'], 'company_id-'.$companyId, 'UPDATE FOR COMPANY', '', 'not_set', '', '', '', '');
+        HistoryService::insertEventLog($user['_id'], 'company_id-'.$companyId, 'UPDATE FOR COMPANY', '', 'not_set', '', '', '', '');
 
         return response()->json();
     }
@@ -253,7 +253,7 @@ class EventController extends Controller
             ->where('start_date', '>=', Carbon::parse($request->date_range_start)->format('Y-m-d 00:00:00'))
             ->delete();
 
-        HistoryService::insertAction($user['id'], 'delete', Event::class, ['group_id' => $groupId], ['group_id' => $groupId]);
+        HistoryService::insertAction($user['_id'], 'delete', Event::class, ['group_id' => $groupId], ['group_id' => $groupId]);
 
         return new JsonResponse([], 201);
     }

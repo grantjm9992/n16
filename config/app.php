@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Facade;
+use Jenssegers\Mongodb\MongodbServiceProvider;
 
 return [
 
@@ -181,6 +182,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        MongoDBServiceProvider::class,
 
         /*
          * Package Service Providers...

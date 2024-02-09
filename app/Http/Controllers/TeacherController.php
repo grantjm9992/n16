@@ -18,19 +18,28 @@ class TeacherController extends Controller
     public function index(Request $request): JsonResponse
     {
         $classrooms = Teacher::query()
-            ->whereRaw('(leave_date IS NULL OR leave_date >= "' . Carbon::now()->format('Y-m-d'). '") ')
+            ->where(function ($query) {
+                $query->where('leave_date', null)
+                    ->orWhere('leave_date', '>=', Carbon::now()->format('Y-m-d'));
+            })
             ->orderBy('name', 'ASC')
-            ->orderBy('surname', 'ASC')
-            ->with('company');
-
+            ->orderBy('surname', 'ASC');
         $user = Auth::user()->toArray();
 
         if (!in_array($user['user_role'], ['super_admin', 'admin', 'director'])) {
-            $classrooms->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
+            $classrooms
+                ->where(function ($query) use ($user) {
+                    $query->where('company_id', $user['company_id'])
+                        ->orWhere('company_id', 'not_set');
+            });
         }
 
         if ($request->query->get('company_id')) {
-            $classrooms->whereRaw('(company_id = :company_id OR company_id = "not_set")', ['company_id' => $user['company_id']]);
+            $classrooms
+                ->where(function ($query) use ($user) {
+                    $query->where('company_id', $user['company_id'])
+                        ->orWhere('company_id', 'not_set');
+                });
         }
 
         return response()->json([

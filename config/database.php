@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION', 'mongodb'),
 
     /*
     |--------------------------------------------------------------------------
@@ -94,6 +94,15 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'mongodb' => [
+            'driver' => 'mongodb',
+            'dsn' => 'mongodb+srv://grant_macdonald:grant_macdonald@cluster0.akcbrkw.mongodb.net/laravel?retryWrites=true&w=majority',
+            // 'host' => '172.19.0.5',
+            // 'port' => '27017',
+            'database' => 'laravel',
+            //'username' => 'root',
+            //'password' => 'root',
+        ],
     ],
 
     /*
