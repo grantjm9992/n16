@@ -180,6 +180,7 @@ class TeachingHourController extends Controller
             ->select('start_date', 'end_date', 'teacher_id', 'department_id')
             ->where('start_date', '>=', Carbon::parse($request->start_date)->format('Y-m-d 00:00:00'))
             ->where('end_date', '<=', Carbon::parse($request->end_date)->format('Y-m-d 23:59:59'))
+            ->whereNotNull('department_id')
             ->whereIn('teacher_id', $teacherIds);
 
         $events = $query->get()->toArray();
