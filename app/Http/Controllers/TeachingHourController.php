@@ -186,7 +186,7 @@ class TeachingHourController extends Controller
         $returnArray = [];
         $toggleArray = [];
         foreach ($events as $event) {
-            $key = $event['teacher_id'].'-'.$event['department_id'];
+            $key = $event['teacher_id'].'-'.$event['department_id'] ?? '';
             if (array_key_exists($key, $toggleArray)) {
                 $toggleArray[$key]['time'] += round($this->getTotalTimeForEventArray([$event])/3600, 2);
             } else {
