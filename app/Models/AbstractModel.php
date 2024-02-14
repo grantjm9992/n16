@@ -55,6 +55,9 @@ class AbstractModel extends Model
     {
         $array = parent::toArray();
         $array['id'] = $array['_id'] ?? null;
+        if (array_key_exists('status_id', $array)) {
+            $array['status_id'] = (string)$array['status_id'];
+        }
         return $array;
     }
 }

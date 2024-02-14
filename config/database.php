@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mongodb'),
+    'default' => 'mongodb',
 
     /*
     |--------------------------------------------------------------------------
@@ -96,7 +96,7 @@ return [
 
         'mongodb' => [
             'driver' => 'mongodb',
-            'dsn' => 'mongodb+srv://grant_macdonald:grant_macdonald@cluster0.akcbrkw.mongodb.net/laravel?retryWrites=true&w=majority',
+            'dsn' => 'mongodb://localhost/laravel?retryWrites=true&w=majority',
             // 'host' => '172.19.0.5',
             // 'port' => '27017',
             'database' => 'laravel',

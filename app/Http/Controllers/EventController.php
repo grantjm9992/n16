@@ -226,7 +226,7 @@ class EventController extends Controller
     {
         $user = Auth::user()->toArray();
         Event::query()
-            ->join('classrooms', 'classrooms.id', '=', 'events.classroom_id')
+            ->join('classrooms', 'classrooms._id', '=', 'events.classroom_id')
             ->where('classrooms.company_id', $companyId)
             ->where('start_date', '>=', Carbon::parse($day)->format('Y-m-d 00:00'))
             ->where('start_date', '<=', Carbon::parse($day)->format('Y-m-d 23:59'))
