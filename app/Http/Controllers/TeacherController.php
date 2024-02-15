@@ -19,7 +19,7 @@ class TeacherController extends Controller
     {
         $classrooms = Teacher::query()
             ->where(function ($query) {
-                $query->where('leave_date', null)
+                return $query->where('leave_date', null)
                     ->orWhere('leave_date', '>=', Carbon::now()->format('Y-m-d'));
             })
             ->orderBy('name', 'ASC')
@@ -27,24 +27,17 @@ class TeacherController extends Controller
         $user = Auth::user()->toArray();
 
         if (!in_array($user['user_role'], ['super_admin', 'admin', 'director'])) {
-            $classrooms
-                ->where(function ($query) use ($user) {
-                    $query->where('company_id', $user['company_id'])
-                        ->orWhere('company_id', 'not_set');
-            });
+            $classrooms->whereIn('company_id', ['not_set', $user['company_id']]);
         }
 
         if ($request->query->get('company_id')) {
-            $classrooms
-                ->where(function ($query) use ($user) {
-                    $query->where('company_id', $user['company_id'])
-                        ->orWhere('company_id', 'not_set');
-                });
+            $classrooms->whereIn('company_id', ['not_set', $request->query->get('company_id')]);
         }
 
+        $data = $classrooms->get()->toArray();
         return response()->json([
             'status' => 'success',
-            'data' => $classrooms->get(),
+            'data' => $data,
         ]);
     }
 

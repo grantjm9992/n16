@@ -48,4 +48,11 @@ class Teacher extends AbstractModel
     {
         return $this->hasMany(Event::class);
     }
+
+    public function toArray(): array
+    {
+        $array = parent::toArray();
+        $array['surname'] = $array['surname'] ?? '';
+        return $array;
+    }
 }
